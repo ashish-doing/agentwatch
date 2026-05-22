@@ -1,22 +1,60 @@
 """
 agentwatch/backend/agent/demo_agent.py
-
-NO API KEY REQUIRED.
-Simulates a realistic LangGraph agent and sends real OTel events to Splunk.
-
-Modes:
-  normal      → healthy research agent, trust scores 0.85-1.0
-  loop        → search_tool called 23x, trust drops to 0.05, anomaly fires
-  hallucinate → token spikes to 8000+, trust degrades
-  drift       → each step gets 30% slower, latency anomaly fires
+NO API KEY REQUIRED. Sends events directly to Splunk HEC.
 """
 
 import random
 import time
+import uuid
+import urllib.request
+import ssl
+import json
 from typing import TypedDict, List
 from langgraph.graph import StateGraph, END
 
+# ── HEC integration (set by agent_runner) ──
+_hec_token = ""
+_hec_url = ""
+_trace_id = ""
+_index = "agentwatch"
+_ctx2 = ssl.create_default_context()
+_ctx2.check_hostname = False
+_ctx2.verify_mode = ssl.CERT_NONE
 
+def _send(event_type, step_name, **kwargs):
+    if not _hec_token:
+        return
+    event = {
+        "event_type": event_type,
+        "step_name": step_name,
+        "timestamp": time.time(),
+        "trace_id": _trace_id,
+        "agent_id": "demo-001",
+        "step_id": str(uuid.uuid4())[:8],
+        **kwargs,
+    }
+    try:
+        payload = json.dumps({
+            "index": _index,
+            "source": "agentwatch",
+            "sourcetype": "agentwatch:otel",
+            "event": event,
+        }).encode()
+        req = urllib.request.Request(
+            _hec_url,
+            data=payload,
+            headers={
+                "Authorization": f"Splunk {_hec_token}",
+                "Content-Type": "application/json",
+            },
+            method="POST",
+        )
+        urllib.request.urlopen(req, context=_ctx2, timeout=3)
+    except Exception as e:
+        pass
+
+
+# ── Agent State ──
 class AgentState(TypedDict):
     messages: List[dict]
     research_topic: str
@@ -27,6 +65,7 @@ class AgentState(TypedDict):
     mode: str
 
 
+# ── Mock Responses ──
 SEARCH_RESULTS = [
     "Global AI agent market projected at $28.5B by 2028, growing 43% CAGR.",
     "LangGraph: 50,000+ GitHub stars, used by Fortune 500 for agent orchestration.",
@@ -56,7 +95,8 @@ FINAL_REPORTS = [
 ]
 
 
-def simulate_search(query: str, mode: str, call_count: int) -> dict:
+# ── Tool Simulators ──
+def simulate_search(query, mode, call_count):
     base_ms = 180 + random.randint(20, 80)
     if mode == "drift":
         base_ms = int(base_ms * (1 + 0.3 * call_count))
@@ -68,12 +108,12 @@ def simulate_search(query: str, mode: str, call_count: int) -> dict:
     return {"tool_name": "search_tool", "input": query, "output": output, "duration_ms": base_ms}
 
 
-def simulate_calculator(expression: str) -> dict:
+def simulate_calculator(expression):
     time.sleep(0.012)
     return {"tool_name": "calculator_tool", "input": expression, "output": "40.755B USD projected 2027", "duration_ms": 12}
 
 
-def simulate_llm(step: str, mode: str) -> dict:
+def simulate_llm(step, mode):
     if mode == "hallucinate":
         p, c = random.randint(2000, 4000), random.randint(3000, 5000)
     elif mode == "loop":
@@ -86,11 +126,38 @@ def simulate_llm(step: str, mode: str) -> dict:
             "total_tokens": p + c, "duration_ms": latency, "reasoning": random.choice(REASONING_STEPS)}
 
 
+# ── Nodes ──
 def research_node(state: AgentState) -> AgentState:
     mode = state.get("mode", "normal")
     loop_count = state.get("loop_count", 0)
+    trust = max(0.1, 1.0 - loop_count * 0.04)
+
+    _send("step_start", "research", trust_score=1.0)
+
     llm = simulate_llm("research", mode)
+    _send("llm_call", "research",
+          llm_total_tokens=llm["total_tokens"],
+          llm_model="mock-llm",
+          trust_score=trust,
+          reasoning_content=llm["reasoning"])
+
     search = simulate_search(f"AI {state.get('research_topic', 'observability')}", mode, loop_count)
+    tool_trust = max(0.05, 1.0 - loop_count * 0.05)
+    _send("tool_call", f"tool:search_tool",
+          tool_name="search_tool",
+          tool_input=search["input"],
+          tool_output=search["output"],
+          duration_ms=search["duration_ms"],
+          trust_score=tool_trust)
+
+    if loop_count >= 5:
+        _send("anomaly", "tool:search_tool",
+              tool_name="search_tool",
+              trust_score=0.05,
+              reasoning_content=f"Loop detected — search_tool called {loop_count}x in this run")
+
+    _send("step_end", "research", duration_ms=1200, trust_score=trust)
+
     results = state.get("search_results", [])
     results.append(search["output"])
     messages = state.get("messages", [])
@@ -101,8 +168,22 @@ def research_node(state: AgentState) -> AgentState:
 
 def analysis_node(state: AgentState) -> AgentState:
     mode = state.get("mode", "normal")
+    _send("step_start", "analysis", trust_score=0.9)
+
     llm = simulate_llm("analysis", mode)
+    _send("llm_call", "analysis",
+          llm_total_tokens=llm["total_tokens"],
+          llm_model="mock-llm",
+          trust_score=0.85)
+
     calc = simulate_calculator("28.5 * 1.43")
+    _send("tool_call", "tool:calculator_tool",
+          tool_name="calculator_tool",
+          duration_ms=12,
+          trust_score=0.92)
+
+    _send("step_end", "analysis", duration_ms=900, trust_score=0.88)
+
     calcs = state.get("calculations", [])
     calcs.append(calc["output"])
     messages = state.get("messages", [])
@@ -112,13 +193,23 @@ def analysis_node(state: AgentState) -> AgentState:
 
 def synthesis_node(state: AgentState) -> AgentState:
     mode = state.get("mode", "normal")
+    _send("step_start", "synthesis", trust_score=0.9)
+
     llm = simulate_llm("synthesis", mode)
-    messages = state.get("messages", [])
+    _send("llm_call", "synthesis",
+          llm_total_tokens=llm["total_tokens"],
+          llm_model="mock-llm",
+          trust_score=0.9)
+
     report = random.choice(FINAL_REPORTS)
+    _send("step_end", "synthesis", duration_ms=700, trust_score=0.9)
+
+    messages = state.get("messages", [])
     messages.append({"role": "assistant", "content": report, "tokens": llm["total_tokens"]})
     return {**state, "messages": messages, "final_report": report}
 
 
+# ── Routing ──
 def should_continue(state: AgentState) -> str:
     mode = state.get("mode", "normal")
     count = state.get("loop_count", 0)
@@ -129,6 +220,7 @@ def should_continue(state: AgentState) -> str:
     return "analysis"
 
 
+# ── Graph ──
 def build_demo_agent():
     graph = StateGraph(AgentState)
     graph.add_node("research", research_node)
@@ -142,7 +234,7 @@ def build_demo_agent():
     return graph.compile()
 
 
-def make_initial_state(mode: str = "normal", topic: str = "AI agent observability") -> AgentState:
+def make_initial_state(mode="normal", topic="AI agent observability") -> AgentState:
     topics = {
         "normal": "AI agent observability market size and trends 2026",
         "loop": "latest AI agent failure modes and loop detection",
