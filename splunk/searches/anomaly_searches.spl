@@ -1,0 +1,86 @@
+| ============================================================
+| AgentWatch — Pre-built SPL Searches
+| Import these into Splunk Saved Searches or paste in Search
+| ============================================================
+
+| ── 1. Loop Detection ──────────────────────────────────────
+| Find agents stuck in tool-call loops (called same tool >5x)
+index=agentwatch event_type=tool_call earliest=-1h
+| stats count as call_count by agent_id, tool_name, trace_id
+| where call_count > 5
+| sort -call_count
+| table _time, agent_id, tool_name, trace_id, call_count
+
+
+| ── 2. Token Spike Detection ────────────────────────────────
+| Find LLM calls with unusually high token counts
+index=agentwatch event_type=llm_call earliest=-1h
+| eval is_spike=if(llm_total_tokens > 3000, 1, 0)
+| stats max(llm_total_tokens) as max_tokens, avg(llm_total_tokens) as avg_tokens by step_name, trace_id
+| where max_tokens > 3000
+| sort -max_tokens
+
+
+| ── 3. Trust Score Heatmap ──────────────────────────────────
+| Average trust score per tool — find the least reliable tools
+index=agentwatch earliest=-6h
+| stats avg(trust_score) as avg_trust, count as calls by tool_name
+| eval health=case(avg_trust > 0.8, "healthy", avg_trust > 0.5, "degraded", true(), "critical")
+| sort avg_trust
+
+
+| ── 4. Anomaly Timeline ─────────────────────────────────────
+| All anomalies over time with context
+index=agentwatch event_type=anomaly earliest=-24h
+| sort -_time
+| table _time, agent_id, tool_name, reasoning_content, trust_score, trace_id
+
+
+| ── 5. Agent Latency Degradation ───────────────────────────
+| Steps getting slower over time (drift pattern)
+index=agentwatch event_type=step_end earliest=-2h
+| timechart span=5m avg(duration_ms) by step_name
+
+
+| ── 6. Error Rate by Step ───────────────────────────────────
+| Which steps are most error-prone?
+index=agentwatch event_type=error earliest=-24h
+| stats count as error_count by step_name, error
+| sort -error_count
+| head 20
+
+
+| ── 7. Full Trace Reconstruction ───────────────────────────
+| Reconstruct a single agent run in order (replace TRACE_ID)
+index=agentwatch trace_id=TRACE_ID
+| sort _time
+| table _time, event_type, step_name, tool_name, llm_total_tokens, trust_score, duration_ms, error
+
+
+| ── 8. Cisco Deep Time Series Input ─────────────────────────
+| Feed this timeseries into AI Toolkit for anomaly detection
+index=agentwatch event_type=tool_call earliest=-6h
+| timechart span=30s count as tool_call_count by tool_name
+| fillnull value=0
+
+
+| ── 9. Real-time Agent Health Dashboard ─────────────────────
+| Summary metrics for the AgentWatch dashboard header
+index=agentwatch earliest=-1h
+| stats count as total_events,
+        avg(trust_score) as avg_trust,
+        count(eval(event_type="anomaly")) as anomalies,
+        dc(agent_id) as active_agents,
+        dc(trace_id) as active_traces
+| eval avg_trust=round(avg_trust, 3)
+
+
+| ── 10. Compare Agent Runs ──────────────────────────────────
+| Compare token usage and trust across multiple traces
+index=agentwatch event_type IN (llm_call, tool_call) earliest=-24h
+| stats avg(trust_score) as avg_trust,
+        sum(llm_total_tokens) as total_tokens,
+        count as events,
+        max(duration_ms) as max_duration_ms
+  by trace_id, agent_id
+| sort -avg_trust

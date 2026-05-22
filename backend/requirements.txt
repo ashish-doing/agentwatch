@@ -1,0 +1,37 @@
+# AgentWatch Backend Requirements
+# Install: pip install -r requirements.txt
+
+# LangGraph + LLM
+langgraph==0.2.28
+langchain==0.3.7
+langchain-openai==0.2.8
+langchain-community==0.3.7
+
+# OpenTelemetry
+opentelemetry-sdk==1.27.0
+opentelemetry-api==1.27.0
+opentelemetry-exporter-otlp==1.27.0
+
+# FastAPI + WebSocket
+fastapi==0.115.4
+uvicorn[standard]==0.32.0
+websockets==13.1
+python-multipart==0.0.12
+
+# Splunk SDK
+splunk-sdk==2.1.0
+
+# HTTP + async
+httpx==0.27.2
+aiohttp==3.10.10
+python-dotenv==1.0.1
+
+# Data processing
+numpy>=1.24,<2
+pandas==2.2.3
+
+# Utilities
+pydantic==2.9.2
+structlog==24.4.0
+rich==13.9.4
+typer==0.12.5

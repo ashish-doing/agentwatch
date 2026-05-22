@@ -1,0 +1,52 @@
+version: "3.9"
+
+services:
+
+  # ── FastAPI Backend ──────────────────────────
+  backend:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.backend
+    ports:
+      - "8000:8000"
+    env_file:
+      - ../.env
+    volumes:
+      - ../backend:/app/backend
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # ── Frontend (nginx) ─────────────────────────
+  frontend:
+    image: nginx:alpine
+    ports:
+      - "3000:80"
+    volumes:
+      - ../frontend:/usr/share/nginx/html:ro
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  # ── Demo Agent (runs once) ───────────────────
+  demo-agent:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.backend
+    env_file:
+      - ../.env
+    environment:
+      - DEMO_AGENT_MODE=${DEMO_AGENT_MODE:-normal}
+    command: python backend/agent/agent_runner.py --ws-url ws://backend:8000/ws/agent-stream
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: "no"
+
+networks:
+  default:
+    name: agentwatch-net
