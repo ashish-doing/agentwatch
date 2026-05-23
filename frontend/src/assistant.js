@@ -6,7 +6,7 @@
  * → displays generated SPL + results.
  */
 
-const API_URL = window.__API_URL || 'http://localhost:8000';
+const API_URL = window.__API_URL || 'http://localhost:8001';
 
 const nlInput = document.getElementById('nl-query');
 const splOutput = document.getElementById('spl-output');

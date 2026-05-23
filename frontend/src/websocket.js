@@ -11,7 +11,7 @@
 import { addOrUpdateNode } from './brain.js';
 import { showAnomalyAlert } from './alerts.js';
 
-const WS_URL = window.__WS_URL || 'ws://localhost:8000/ws/browser';
+const WS_URL = window.__WS_URL || 'ws://localhost:8001/ws/browser';
 const connStatus = document.getElementById('conn-status');
 const feedList = document.getElementById('feed-list');
 
