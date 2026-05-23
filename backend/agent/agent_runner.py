@@ -28,7 +28,7 @@ from rich.panel import Panel
 console = Console()
 logging.basicConfig(level=logging.WARNING)
 
-HEC_TOKEN = os.getenv("SPLUNK_HEC_TOKEN", "f5cd71be-6fe6-4f40-b645-09454f5e4f90")
+HEC_TOKEN = os.getenv("SPLUNK_HEC_TOKEN", "")
 HEC_HOST = os.getenv("SPLUNK_HOST", "localhost")
 HEC_PORT = os.getenv("SPLUNK_HEC_PORT", "8088")
 INDEX = os.getenv("SPLUNK_INDEX", "agentwatch")
