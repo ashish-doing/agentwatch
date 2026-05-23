@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AgentWatch — AI Agent Observability Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Bebas+Neue&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #04060f;
+      --bg2: #080d1c;
+      --green: #00ff88;
+      --cyan: #00e5ff;
+      --red: #ff3355;
+      --orange: #ff8800;
+      --blue: #4f8fff;
+      --text: #c8d8f0;
+      --dim: #4a6080;
+      --mono: 'DM Mono', monospace;
+      --display: 'Bebas Neue', sans-serif;
+      --sans: 'DM Sans', sans-serif;
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      overflow-x: hidden;
+    }
+
+    /* ── Noise overlay ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 1000;
+      opacity: 0.4;
+    }
+
+    /* ── Nav ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 48px;
+      background: rgba(4,6,15,0.8);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(0,229,255,0.08);
+    }
+
+    .nav-logo {
+      font-family: var(--display);
+      font-size: 28px;
+      letter-spacing: 2px;
+      background: linear-gradient(135deg, var(--cyan), var(--blue));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--dim);
+      text-decoration: none;
+      font-size: 13px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--cyan); }
+
+    .nav-cta {
+      background: transparent;
+      border: 1px solid var(--cyan);
+      color: var(--cyan) !important;
+      padding: 8px 20px;
+      border-radius: 4px;
+      transition: all 0.2s !important;
+    }
+
+    .nav-cta:hover {
+      background: var(--cyan) !important;
+      color: var(--bg) !important;
+      -webkit-text-fill-color: var(--bg) !important;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 120px 24px 80px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Grid background */
+    .hero::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0,229,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,229,255,0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black, transparent);
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(0,229,255,0.08);
+      border: 1px solid rgba(0,229,255,0.2);
+      border-radius: 100px;
+      padding: 6px 16px;
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--cyan);
+      margin-bottom: 32px;
+      animation: fadeUp 0.6s ease both;
+    }
+
+    .badge-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: pulse-dot 2s infinite;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(0,255,136,0.4); }
+      50% { opacity: 0.7; box-shadow: 0 0 0 6px rgba(0,255,136,0); }
+    }
+
+    .hero-title {
+      font-family: var(--display);
+      font-size: clamp(72px, 12vw, 160px);
+      letter-spacing: 4px;
+      line-height: 0.9;
+      margin-bottom: 24px;
+      animation: fadeUp 0.6s 0.1s ease both;
+    }
+
+    .hero-title span {
+      display: block;
+      background: linear-gradient(135deg, #fff 0%, var(--cyan) 50%, var(--blue) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-title .accent {
+      background: linear-gradient(135deg, var(--red), var(--orange));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-size: 0.4em;
+      letter-spacing: 8px;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .hero-sub {
+      font-size: clamp(16px, 2vw, 20px);
+      color: var(--dim);
+      max-width: 600px;
+      line-height: 1.7;
+      margin-bottom: 48px;
+      animation: fadeUp 0.6s 0.2s ease both;
+    }
+
+    .hero-sub strong { color: var(--text); }
+
+    .hero-buttons {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      justify-content: center;
+      animation: fadeUp 0.6s 0.3s ease both;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--cyan);
+      color: var(--bg);
+      padding: 14px 32px;
+      border-radius: 4px;
+      font-weight: 700;
+      font-size: 14px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .btn-primary:hover {
+      background: #fff;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(0,229,255,0.3);
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: transparent;
+      color: var(--text);
+      padding: 14px 32px;
+      border-radius: 4px;
+      border: 1px solid rgba(255,255,255,0.1);
+      font-size: 14px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--cyan);
+      color: var(--cyan);
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Stats bar ── */
+    .stats-bar {
+      display: flex;
+      justify-content: center;
+      gap: 0;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      background: var(--bg2);
+    }
+
+    .stat {
+      flex: 1;
+      max-width: 200px;
+      padding: 32px 24px;
+      text-align: center;
+      border-right: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .stat:last-child { border-right: none; }
+
+    .stat-num {
+      font-family: var(--display);
+      font-size: 48px;
+      letter-spacing: 2px;
+      background: linear-gradient(135deg, var(--cyan), var(--blue));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--dim);
+      margin-top: 8px;
+    }
+
+    /* ── Section ── */
+    section {
+      padding: 100px 24px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--cyan);
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-family: var(--display);
+      font-size: clamp(40px, 6vw, 80px);
+      letter-spacing: 2px;
+      line-height: 1;
+      margin-bottom: 24px;
+      color: #fff;
+    }
+
+    .section-sub {
+      font-size: 18px;
+      color: var(--dim);
+      max-width: 560px;
+      line-height: 1.7;
+      margin-bottom: 64px;
+    }
+
+    /* ── How it works ── */
+    .pipeline {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      position: relative;
+    }
+
+    .pipeline::before {
+      content: '';
+      position: absolute;
+      left: 24px;
+      top: 48px;
+      bottom: 48px;
+      width: 1px;
+      background: linear-gradient(to bottom, var(--cyan), var(--blue), var(--red));
+    }
+
+    .pipeline-step {
+      display: flex;
+      gap: 32px;
+      align-items: flex-start;
+      padding: 32px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+
+    .step-num {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--bg2);
+      border: 1px solid var(--cyan);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--cyan);
+      flex-shrink: 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    .step-content h3 {
+      font-family: var(--sans);
+      font-weight: 700;
+      font-size: 18px;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+
+    .step-content p {
+      font-size: 14px;
+      color: var(--dim);
+      line-height: 1.7;
+    }
+
+    .step-tag {
+      display: inline-block;
+      background: rgba(0,229,255,0.08);
+      border: 1px solid rgba(0,229,255,0.15);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 1px;
+      padding: 2px 8px;
+      border-radius: 3px;
+      margin-top: 8px;
+    }
+
+    /* ── Features grid ── */
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .feature {
+      background: var(--bg2);
+      padding: 40px 32px;
+      transition: background 0.2s;
+    }
+
+    .feature:hover { background: rgba(0,229,255,0.04); }
+
+    .feature-icon {
+      font-size: 32px;
+      margin-bottom: 20px;
+      display: block;
+    }
+
+    .feature h3 {
+      font-weight: 700;
+      font-size: 18px;
+      color: #fff;
+      margin-bottom: 12px;
+    }
+
+    .feature p {
+      font-size: 14px;
+      color: var(--dim);
+      line-height: 1.7;
+    }
+
+    /* ── Terminal demo ── */
+    .terminal {
+      background: #020408;
+      border: 1px solid rgba(0,229,255,0.15);
+      border-radius: 12px;
+      overflow: hidden;
+      font-family: var(--mono);
+      font-size: 13px;
+    }
+
+    .terminal-bar {
+      background: rgba(0,229,255,0.05);
+      border-bottom: 1px solid rgba(0,229,255,0.1);
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .terminal-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+    }
+
+    .t-red { background: #ff5f57; }
+    .t-yellow { background: #ffbd2e; }
+    .t-green { background: #28c840; }
+
+    .terminal-title {
+      margin-left: 8px;
+      font-size: 11px;
+      color: var(--dim);
+      letter-spacing: 1px;
+    }
+
+    .terminal-body {
+      padding: 24px;
+      line-height: 2;
+    }
+
+    .t-prompt { color: var(--dim); }
+    .t-cmd { color: var(--cyan); }
+    .t-comment { color: #3a5070; }
+    .t-green-text { color: var(--green); }
+    .t-red-text { color: var(--red); }
+    .t-yellow-text { color: var(--orange); }
+    .t-white { color: #fff; }
+    .t-dim { color: var(--dim); }
+
+    /* ── Splunk badge ── */
+    .splunk-section {
+      background: var(--bg2);
+      border-top: 1px solid rgba(255,255,255,0.06);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      padding: 80px 24px;
+      text-align: center;
+    }
+
+    .splunk-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--dim);
+      margin-bottom: 48px;
+    }
+
+    .tech-stack {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .tech-badge {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 6px;
+      padding: 10px 20px;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--text);
+      letter-spacing: 1px;
+      transition: all 0.2s;
+    }
+
+    .tech-badge:hover {
+      border-color: var(--cyan);
+      color: var(--cyan);
+      background: rgba(0,229,255,0.05);
+    }
+
+    /* ── CTA ── */
+    .cta-section {
+      text-align: center;
+      padding: 120px 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-glow {
+      position: absolute;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0,229,255,0.06), transparent 70%);
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+
+    .cta-section h2 {
+      font-family: var(--display);
+      font-size: clamp(48px, 8vw, 100px);
+      letter-spacing: 2px;
+      color: #fff;
+      margin-bottom: 24px;
+      position: relative;
+    }
+
+    .cta-section p {
+      font-size: 18px;
+      color: var(--dim);
+      margin-bottom: 48px;
+      position: relative;
+    }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding: 32px 48px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--dim);
+    }
+
+    footer a { color: var(--dim); text-decoration: none; }
+    footer a:hover { color: var(--cyan); }
+
+    /* ── Anomaly demo card ── */
+    .demo-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 48px;
+    }
+
+    .demo-card {
+      background: var(--bg2);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 8px;
+      padding: 20px;
+      font-family: var(--mono);
+      font-size: 12px;
+    }
+
+    .demo-card.anomaly {
+      border-color: rgba(255,51,85,0.3);
+      background: rgba(255,51,85,0.05);
+    }
+
+    .demo-card-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .demo-card-header.red { color: var(--red); }
+    .demo-card-header.green { color: var(--green); }
+    .demo-card-header.blue { color: var(--blue); }
+
+    .trust-bar-wrap {
+      height: 3px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 2px;
+      margin-top: 8px;
+      overflow: hidden;
+    }
+
+    .trust-fill {
+      height: 100%;
+      border-radius: 2px;
+    }
+
+    @media (max-width: 768px) {
+      nav { padding: 16px 20px; }
+      .nav-links { display: none; }
+      .demo-cards { grid-template-columns: 1fr; }
+      .stats-bar { flex-wrap: wrap; }
+      footer { flex-direction: column; gap: 12px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav>
+  <div class="nav-logo">AgentWatch</div>
+  <ul class="nav-links">
+    <li><a href="#how">How it works</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#demo">Demo</a></li>
+    <li><a href="https://github.com/ashish-doing/agentwatch" class="nav-cta" target="_blank">GitHub →</a></li>
+  </ul>
+</nav>
+
+<!-- Hero -->
+<div class="hero">
+  <div class="hero-badge">
+    <div class="badge-dot"></div>
+    Splunk Agentic Ops Hackathon 2026
+  </div>
+  <h1 class="hero-title">
+    <span class="accent">AI Agents Need A</span>
+    <span>GUARDIAN</span>
+  </h1>
+  <p class="hero-sub">
+    <strong>AgentWatch</strong> wraps any LangGraph agent with OpenTelemetry, streams behavior into Splunk in real time, detects anomalies, and explains them in plain English.
+  </p>
+  <div class="hero-buttons">
+    <a href="https://github.com/ashish-doing/agentwatch" class="btn-primary" target="_blank">
+      ⭐ View on GitHub
+    </a>
+    <a href="#demo" class="btn-secondary">
+      Watch Demo ↓
+    </a>
+  </div>
+</div>
+
+<!-- Stats -->
+<div class="stats-bar">
+  <div class="stat">
+    <div class="stat-num">5</div>
+    <div class="stat-label">Splunk AI Tools</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num">34%</div>
+    <div class="stat-label">Agents Fail Silently</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num">&lt;1s</div>
+    <div class="stat-label">Detection Time</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num">∞</div>
+    <div class="stat-label">Agents Supported</div>
+  </div>
+</div>
+
+<!-- How it works -->
+<section id="how">
+  <div class="section-label">// Architecture</div>
+  <h2 class="section-title">HOW IT WORKS</h2>
+  <p class="section-sub">Five Splunk AI tools working in a coherent pipeline to watch, detect, and explain agent failures.</p>
+
+  <div class="pipeline">
+    <div class="pipeline-step">
+      <div class="step-num">01</div>
+      <div class="step-content">
+        <h3>Instrument Your Agent</h3>
+        <p>OpenTelemetry hooks wrap every LangGraph node — capturing LLM calls, tool invocations, token counts, latency, and errors with zero code changes.</p>
+        <span class="step-tag">OpenTelemetry SDK</span>
+      </div>
+    </div>
+    <div class="pipeline-step">
+      <div class="step-num">02</div>
+      <div class="step-content">
+        <h3>Stream to Splunk</h3>
+        <p>Events flow in real time via HTTP Event Collector. Every reasoning step becomes a searchable, structured log with full context preserved.</p>
+        <span class="step-tag">Splunk MCP Server</span>
+      </div>
+    </div>
+    <div class="pipeline-step">
+      <div class="step-num">03</div>
+      <div class="step-content">
+        <h3>Detect Anomalies</h3>
+        <p>Cisco Deep Time Series model identifies loops, token spikes, latency drift, and error cascades automatically — no manual thresholds required.</p>
+        <span class="step-tag">Splunk AI Toolkit + Cisco Deep Time Series</span>
+      </div>
+    </div>
+    <div class="pipeline-step">
+      <div class="step-num">04</div>
+      <div class="step-content">
+        <h3>Explain in Plain English</h3>
+        <p>Foundation-Sec-1.1-8B reasons over the anomaly context and produces a human-readable explanation with a specific fix recommendation.</p>
+        <span class="step-tag">Foundation-Sec-1.1-8B</span>
+      </div>
+    </div>
+    <div class="pipeline-step">
+      <div class="step-num">05</div>
+      <div class="step-content">
+        <h3>Query with Natural Language</h3>
+        <p>"Show me all loops in the last hour" → auto-generated SPL → results. No SPL expertise needed.</p>
+        <span class="step-tag">Splunk AI Assistant</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Features -->
+<section id="features">
+  <div class="section-label">// Capabilities</div>
+  <h2 class="section-title">WHAT IT CATCHES</h2>
+  <p class="section-sub">Every failure mode your AI agents can have — detected before it costs you.</p>
+
+  <div class="features">
+    <div class="feature">
+      <span class="feature-icon">🔁</span>
+      <h3>Loop Detection</h3>
+      <p>Catches agents stuck calling the same tool repeatedly. Alerts fire when call count exceeds threshold, before the bill does.</p>
+    </div>
+    <div class="feature">
+      <span class="feature-icon">📈</span>
+      <h3>Token Spikes</h3>
+      <p>Identifies runaway generation — context windows growing unboundedly, prompts accumulating message history without truncation.</p>
+    </div>
+    <div class="feature">
+      <span class="feature-icon">🐌</span>
+      <h3>Latency Drift</h3>
+      <p>Detects steps getting progressively slower over time — the silent performance degradation that's impossible to spot manually.</p>
+    </div>
+    <div class="feature">
+      <span class="feature-icon">💀</span>
+      <h3>Silent Failures</h3>
+      <p>Every unhandled exception, every tool error, every confidence collapse — captured with full stack context in Splunk.</p>
+    </div>
+    <div class="feature">
+      <span class="feature-icon">🧠</span>
+      <h3>Live Brain Graph</h3>
+      <p>Three.js force-directed visualization shows your agent's reasoning in real time. Green nodes are healthy. Red nodes need attention.</p>
+    </div>
+    <div class="feature">
+      <span class="feature-icon">🔍</span>
+      <h3>Trust Scoring</h3>
+      <p>Every node gets a trust score (0-100%) based on call patterns, token usage, and error rates. Composite score surfaces risk instantly.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Terminal Demo -->
+<section id="demo">
+  <div class="section-label">// Demo</div>
+  <h2 class="section-title">SEE IT LIVE</h2>
+  <p class="section-sub">Run the demo agent in loop mode and watch AgentWatch catch it in real time.</p>
+
+  <div class="terminal">
+    <div class="terminal-bar">
+      <div class="terminal-dot t-red"></div>
+      <div class="terminal-dot t-yellow"></div>
+      <div class="terminal-dot t-green"></div>
+      <span class="terminal-title">agentwatch — loop mode</span>
+    </div>
+    <div class="terminal-body">
+      <div><span class="t-prompt">$ </span><span class="t-cmd">python backend/agent/agent_runner.py --mode loop</span></div>
+      <div>&nbsp;</div>
+      <div><span class="t-comment"># Agent starts running...</span></div>
+      <div><span class="t-green-text">  step_start   </span><span class="t-white">research                       </span><span class="t-green-text">trust=100%</span></div>
+      <div><span class="t-green-text">  llm_call     </span><span class="t-white">research                       </span><span class="t-green-text">trust=96%</span></div>
+      <div><span class="t-green-text">  tool_call    </span><span class="t-white">tool:search_tool               </span><span class="t-green-text">trust=88%</span></div>
+      <div><span class="t-yellow-text">  tool_call    </span><span class="t-white">tool:search_tool               </span><span class="t-yellow-text">trust=62%</span></div>
+      <div><span class="t-yellow-text">  tool_call    </span><span class="t-white">tool:search_tool               </span><span class="t-yellow-text">trust=44%</span></div>
+      <div><span class="t-red-text">  tool_call    </span><span class="t-white">tool:search_tool               </span><span class="t-red-text">trust=18%</span></div>
+      <div><span class="t-red-text">  tool_call    </span><span class="t-white">tool:search_tool               </span><span class="t-red-text">trust=05%</span></div>
+      <div>&nbsp;</div>
+      <div><span class="t-red-text">⚠ ANOMALY DETECTED</span></div>
+      <div><span class="t-dim">  Loop detected — search_tool called 23x in 4s</span></div>
+      <div><span class="t-dim">  Foundation-Sec: "Agent stuck at query refinement —</span></div>
+      <div><span class="t-dim">  no exit condition when search returns empty results"</span></div>
+      <div><span class="t-dim">  Fix: add empty-result guard at step 3</span></div>
+      <div>&nbsp;</div>
+      <div><span class="t-green-text">✅ Agent run complete</span></div>
+      <div><span class="t-dim">Events sent to Splunk: 118</span></div>
+      <div><span class="t-dim">View trace: search index=agentwatch trace_id=b1236c8f...</span></div>
+    </div>
+  </div>
+
+  <div class="demo-cards">
+    <div class="demo-card anomaly">
+      <div class="demo-card-header red">⚠ Anomaly · search_tool</div>
+      <div>Loop detected — called 23x in 4s</div>
+      <div style="color:#5a7090;margin-top:4px">trust_score: 0.05</div>
+      <div class="trust-bar-wrap"><div class="trust-fill" style="width:5%;background:#ff3355"></div></div>
+    </div>
+    <div class="demo-card">
+      <div class="demo-card-header green">✅ Healthy · calculator_tool</div>
+      <div>28.5 * 1.43 = 40.755B</div>
+      <div style="color:#5a7090;margin-top:4px">trust_score: 0.92</div>
+      <div class="trust-bar-wrap"><div class="trust-fill" style="width:92%;background:#00ff88"></div></div>
+    </div>
+    <div class="demo-card">
+      <div class="demo-card-header blue">🧠 LLM · research</div>
+      <div>847 tokens · mock-llm</div>
+      <div style="color:#5a7090;margin-top:4px">trust_score: 0.85</div>
+      <div class="trust-bar-wrap"><div class="trust-fill" style="width:85%;background:#4f8fff"></div></div>
+    </div>
+    <div class="demo-card">
+      <div class="demo-card-header green">✅ Step · synthesis</div>
+      <div>duration: 700ms</div>
+      <div style="color:#5a7090;margin-top:4px">trust_score: 0.90</div>
+      <div class="trust-bar-wrap"><div class="trust-fill" style="width:90%;background:#00ff88"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- Tech Stack -->
+<div class="splunk-section">
+  <div class="splunk-label">Built with Splunk AI — Agentic Ops Hackathon 2026</div>
+  <div class="tech-stack">
+    <div class="tech-badge">Splunk MCP Server</div>
+    <div class="tech-badge">Splunk AI Toolkit</div>
+    <div class="tech-badge">Cisco Deep Time Series</div>
+    <div class="tech-badge">Foundation-Sec-1.1-8B</div>
+    <div class="tech-badge">Splunk AI Assistant</div>
+    <div class="tech-badge">OpenTelemetry</div>
+    <div class="tech-badge">LangGraph</div>
+    <div class="tech-badge">Three.js</div>
+    <div class="tech-badge">FastAPI</div>
+  </div>
+</div>
+
+<!-- CTA -->
+<div class="cta-section">
+  <div class="cta-glow"></div>
+  <h2>START WATCHING</h2>
+  <p>Your agents are running. Is anyone watching?</p>
+  <div class="hero-buttons" style="justify-content:center">
+    <a href="https://github.com/ashish-doing/agentwatch" class="btn-primary" target="_blank">
+      ⭐ Star on GitHub
+    </a>
+    <a href="https://github.com/ashish-doing/agentwatch#quick-start" class="btn-secondary" target="_blank">
+      Quick Start →
+    </a>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer>
+  <div>© 2026 AgentWatch · Built for Splunk Agentic Ops Hackathon</div>
+  <div>
+    <a href="https://github.com/ashish-doing/agentwatch" target="_blank">GitHub</a>
+    &nbsp;·&nbsp;
+    <a href="https://splunk.devpost.com" target="_blank">Devpost</a>
+  </div>
+</footer>
+
+</body>
+</html>
