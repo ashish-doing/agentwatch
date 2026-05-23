@@ -88,10 +88,17 @@ REASONING_STEPS = [
 FINAL_REPORTS = [
     "Executive Summary: AI agent observability market represents a $28.5B opportunity. "
     "With 34% of agents failing silently and loop failures costing $2,400/hour, "
-    "AgentWatch addresses a critical enterprise gap. Recommendations: "
-    "(1) Deploy observability before production rollout, "
-    "(2) Instrument all LangGraph nodes with OpenTelemetry, "
-    "(3) Set trust score alerts at threshold 0.5.",
+    "AgentWatch addresses a critical enterprise gap.\n\n"
+    "Key Findings:\n"
+    "  • 34% of production AI agents fail silently\n"
+    "  • Loop failures cost $2,400/hour in wasted API calls\n"
+    "  • Mean detection time without observability: 4.2 hours\n"
+    "  • With AgentWatch: under 1 second\n\n"
+    "Recommendations:\n"
+    "  1. Deploy observability before production rollout\n"
+    "  2. Instrument all LangGraph nodes with OpenTelemetry\n"
+    "  3. Set trust score alerts at threshold 0.5\n"
+    "  4. Enable Foundation-Sec for plain English anomaly explanation",
 ]
 
 
