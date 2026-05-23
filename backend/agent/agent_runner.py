@@ -80,12 +80,20 @@ def main():
     state = make_initial_state(mode=args.mode)
     result = asyncio.run(graph.ainvoke(state, config={"recursion_limit": 50}))
 
+    report = result.get("final_report", "No report generated")
+    console.print("\n")
     console.print(Panel(
-        result.get("final_report", "[dim]No report[/dim]"),
-        title="📄 Final Report", border_style="green",
+        f"\n[bold white]{report}[/bold white]\n",
+        title="[bold green]📄 AgentWatch — Final Report[/bold green]",
+        border_style="green",
+        padding=(1, 4),
+        expand=False,
     ))
-    console.print(f"\n[green]✅ Agent run complete[/green]")
-    console.print(f"[dim]View full trace in Splunk: search index={INDEX} trace_id={trace_id}[/dim]")
+    console.print(f"\n[bold green]✅ Agent run complete[/bold green]")
+    console.print(f"[cyan]📊 Events indexed:[/cyan] [white]check Splunk dashboard[/white]")
+    console.print(f"[cyan]🔗 Splunk trace:[/cyan]  [dim]search index={INDEX} trace_id={trace_id}[/dim]")
+    console.print(f"[cyan]🧠 Brain:[/cyan]          [dim]http://localhost:3000[/dim]")
+    console.print(f"[cyan]📊 Dashboard:[/cyan]      [dim]http://localhost:8000/en-US/app/search/agentwatch[/dim]\n")
 
 
 if __name__ == "__main__":
