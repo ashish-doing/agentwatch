@@ -5,16 +5,16 @@
   <row>
     <panel>
       <single>
-        <title>Total Events (1h)</title>
-        <search><query>index=agentwatch earliest=-1h | stats count</query></search>
+        <title>Total Events (30d)</title>
+        <search><query>index=agentwatch earliest=-30d | stats count</query></search>
         <option name="colorMode">block</option>
         <option name="rangeColors">["0x53A051","0x53A051"]</option>
       </single>
     </panel>
     <panel>
       <single>
-        <title>Anomalies Detected (1h)</title>
-        <search><query>index=agentwatch event_type=anomaly earliest=-1h | stats count</query></search>
+        <title>Anomalies Detected (30d)</title>
+        <search><query>index=agentwatch event_type=anomaly earliest=-30d | stats count</query></search>
         <option name="colorMode">block</option>
         <option name="rangeColors">["0x53A051","0xF8BE34","0xDC4E41"]</option>
         <option name="rangeValues">[0,1]</option>
@@ -23,20 +23,20 @@
     <panel>
       <single>
         <title>Avg Trust Score</title>
-        <search><query>index=agentwatch earliest=-1h | stats avg(trust_score) as avg_trust | eval avg_trust=round(avg_trust*100,1)."%"</query></search>
+        <search><query>index=agentwatch earliest=-30d | stats avg(trust_score) as avg_trust | eval avg_trust=round(avg_trust*100,1)."%"</query></search>
         <option name="field">avg_trust</option>
       </single>
     </panel>
     <panel>
       <single>
         <title>Active Agents</title>
-        <search><query>index=agentwatch earliest=-1h | stats dc(agent_id) as agents</query></search>
+        <search><query>index=agentwatch earliest=-30d | stats dc(agent_id) as agents</query></search>
       </single>
     </panel>
     <panel>
       <single>
         <title>Total Tokens Used</title>
-        <search><query>index=agentwatch event_type=llm_call earliest=-1h | stats sum(llm_total_tokens) as total_tokens</query></search>
+        <search><query>index=agentwatch event_type=llm_call earliest=-30d | stats sum(llm_total_tokens) as total_tokens</query></search>
       </single>
     </panel>
   </row>
@@ -45,7 +45,7 @@
     <panel>
       <chart>
         <title>Agent Events Over Time</title>
-        <search><query>index=agentwatch earliest=-1h | timechart span=1m count by event_type</query></search>
+        <search><query>index=agentwatch earliest=-30d | timechart span=1h count by event_type</query></search>
         <option name="charting.chart">area</option>
         <option name="charting.chart.stackMode">stacked</option>
         <option name="charting.seriesColors">["#53A051","#0099E0","#F8BE34","#DC4E41","#FF6600"]</option>
@@ -54,7 +54,7 @@
     <panel>
       <chart>
         <title>Trust Score Over Time</title>
-        <search><query>index=agentwatch earliest=-1h | timechart span=30s avg(trust_score) as avg_trust</query></search>
+        <search><query>index=agentwatch earliest=-30d | timechart span=1h avg(trust_score) as avg_trust</query></search>
         <option name="charting.chart">line</option>
         <option name="charting.seriesColors">["#53A051"]</option>
       </chart>
@@ -65,7 +65,7 @@
     <panel>
       <chart>
         <title>Tool Call Frequency (Loop Detection)</title>
-        <search><query>index=agentwatch event_type=tool_call earliest=-1h | stats count as call_count by tool_name | sort -call_count</query></search>
+        <search><query>index=agentwatch event_type=tool_call earliest=-30d | stats count as call_count by tool_name | sort -call_count</query></search>
         <option name="charting.chart">bar</option>
         <option name="charting.seriesColors">["#0099E0"]</option>
       </chart>
@@ -73,7 +73,7 @@
     <panel>
       <chart>
         <title>Token Usage by Step</title>
-        <search><query>index=agentwatch event_type=llm_call earliest=-1h | stats avg(llm_total_tokens) as avg_tokens, max(llm_total_tokens) as max_tokens by step_name | sort -avg_tokens</query></search>
+        <search><query>index=agentwatch event_type=llm_call earliest=-30d | stats avg(llm_total_tokens) as avg_tokens, max(llm_total_tokens) as max_tokens by step_name | sort -avg_tokens</query></search>
         <option name="charting.chart">bar</option>
         <option name="charting.seriesColors">["#F8BE34","#DC4E41"]</option>
       </chart>
@@ -84,7 +84,7 @@
     <panel>
       <table>
         <title>⚠️ Recent Anomalies</title>
-        <search><query>index=agentwatch event_type=anomaly earliest=-1h | sort -_time | table _time, agent_id, tool_name, reasoning_content, trust_score, trace_id | head 20</query></search>
+        <search><query>index=agentwatch event_type=anomaly earliest=-30d | sort -_time | table _time, agent_id, tool_name, reasoning_content, trust_score, trace_id | head 20</query></search>
         <option name="drilldown">row</option>
         <format type="color" field="trust_score">
           <colorPalette type="minMidMax" maxColor="#DC4E41" midColor="#F8BE34" minColor="#53A051"/>
@@ -95,7 +95,7 @@
     <panel>
       <chart>
         <title>Trust Score by Tool</title>
-        <search><query>index=agentwatch earliest=-1h | stats avg(trust_score) as avg_trust by tool_name | sort avg_trust</query></search>
+        <search><query>index=agentwatch earliest=-30d | stats avg(trust_score) as avg_trust by tool_name | sort avg_trust</query></search>
         <option name="charting.chart">bar</option>
         <option name="charting.chart.orientation">horizontal</option>
         <option name="charting.seriesColors">["#53A051"]</option>
@@ -107,7 +107,7 @@
     <panel>
       <chart>
         <title>Step Latency — Drift Detection</title>
-        <search><query>index=agentwatch earliest=-1h | stats avg(duration_ms) as avg_ms, max(duration_ms) as max_ms by step_name | sort -avg_ms | head 10</query></search>
+        <search><query>index=agentwatch earliest=-30d | stats avg(duration_ms) as avg_ms, max(duration_ms) as max_ms by step_name | sort -avg_ms | head 10</query></search>
         <option name="charting.chart">bar</option>
         <option name="charting.seriesColors">["#0099E0","#DC4E41"]</option>
       </chart>
@@ -115,7 +115,7 @@
     <panel>
       <table>
         <title>📋 Full Event Log</title>
-        <search><query>index=agentwatch earliest=-1h | sort -_time | table _time, event_type, agent_id, step_name, tool_name, trust_score, llm_total_tokens, duration_ms, trace_id | head 50</query></search>
+        <search><query>index=agentwatch earliest=-30d | sort -_time | table _time, event_type, agent_id, step_name, tool_name, trust_score, llm_total_tokens, duration_ms, trace_id | head 50</query></search>
         <option name="rowNumbers">true</option>
         <format type="color" field="trust_score">
           <colorPalette type="minMidMax" maxColor="#DC4E41" midColor="#F8BE34" minColor="#53A051"/>
