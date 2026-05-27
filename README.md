@@ -17,9 +17,8 @@
 
 <p align="center">
   🌐 <a href="https://ashish-doing.github.io/agentwatch">Landing Page</a> &nbsp;•&nbsp;
-
-  🚀 <a href="#-quick-start">Quick Start</a> &nbsp;•&nbsp;
-  🏗️ <a href="#-architecture">Architecture</a> &nbsp;•&nbsp;
+  🚀 <a href="#quick-start">Quick Start</a> &nbsp;•&nbsp;
+  🏗️ <a href="#architecture">Architecture</a> &nbsp;•&nbsp;
   📋 <a href="architecture_diagram.md">Full Diagram</a>
 </p>
 
@@ -67,7 +66,7 @@ When your agent gets stuck calling the same tool 23 times, nobody knows. When to
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
 ```
 YOUR LANGGRAPH AGENT
@@ -165,7 +164,7 @@ YOUR LANGGRAPH AGENT
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 - Splunk Enterprise (dev license) with HEC enabled
