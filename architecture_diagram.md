@@ -8,106 +8,69 @@ AgentWatch is a real-time AI agent observability platform that instruments LangG
 
 ## Architecture Diagram
 
-```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                          AI AGENT LAYER                                 │
-│                                                                         │
-│  ┌──────────────────┐   ┌──────────────────┐   ┌────────────────────┐  │
-│  │   LangGraph      │   │  OpenTelemetry   │   │  Foundation-Sec    │  │
-│  │   Demo Agent     │──▶│  Instrumentation │   │  (Splunk hosted    │  │
-│  │                  │   │                  │   │   model)           │  │
-│  │  • normal mode   │   │  • traces        │   │                    │  │
-│  │  • loop mode     │   │  • spans         │   │  • rule-based      │  │
-│  │  • hallucinate   │   │  • trust scores  │   │    reasoning       │  │
-│  │  • drift mode    │   │  • token counts  │   │  • "Explain This"  │  │
-│  └──────────────────┘   └────────┬─────────┘   └────────────────────┘  │
-└───────────────────────────────── │ ────────────────────────────────────┘
-                                   │ OTel events + HEC POST
-                                   ▼
-┌─────────────────────────────────────────────────────────────────────────┐
-│                          BACKEND LAYER                                  │
-│                                                                         │
-│  ┌──────────────────┐   ┌──────────────────┐   ┌────────────────────┐  │
-│  │    FastAPI       │   │   Event Stream   │   │   SplunkClient     │  │
-│  │                  │   │                  │   │                    │  │
-│  │  • REST API      │──▶│  • WebSocket     │   │  • HEC indexing    │  │
-│  │  • /run          │   │  • real-time     │   │  • SPL search      │  │
-│  │  • /search       │   │    event push    │   │  • AI Assistant    │  │
-│  │  • /anomalies    │   │  • 500-event     │   │    NL → SPL        │  │
-│  │  • /explain      │   │    ring buffer   │   │  • foundation_sec  │  │
-│  └────────┬─────────┘   └──────────────────┘   └─────────┬──────────┘  │
-└───────────│─────────────────────────────────────────────│──────────────┘
-            │ HEC POST                                     │ SPL queries
-            ▼                                             ▼
-┌─────────────────────────────────────────────────────────────────────────┐
-│                         SPLUNK PLATFORM                                 │
-│                                                                         │
-│  ┌──────────────────┐   ┌──────────────────┐   ┌────────────────────┐  │
-│  │   HEC Ingest     │   │   AI Toolkit     │   │   MCP Server       │  │
-│  │                  │   │                  │   │                    │  │
-│  │  index:          │   │  anomalydetect-  │   │  • NL queries      │  │
-│  │  agentwatch      │   │  ion command     │   │  • SPL generation  │  │
-│  │                  │   │                  │   │  • prize category  │  │
-│  │  sourcetype:     │   │  • tool call     │   │                    │  │
-│  │  agentwatch:otel │   │    frequency     │   │  AI Assistant      │  │
-│  │                  │   │  • time-series   │   │  • NL → SPL bar    │  │
-│  │  1,269+ events   │   │    analysis      │   │  • auto-generated  │  │
-│  └────────┬─────────┘   └──────────────────┘   └────────────────────┘  │
-│           │                                                             │
-│  ┌────────▼─────────────────────────────────────────────────────────┐  │
-│  │                     Splunk Dashboard (8 panels)                   │  │
-│  │   KPI · Anomaly table · Trust heatmap · Loop detection chart     │  │
-│  │   Token usage · Latency drift · Full event log · Trust by tool   │  │
-│  └──────────────────────────────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────────────────────────────┘
-            │ WebSocket (demo simulation)
-            ▼
-┌─────────────────────────────────────────────────────────────────────────┐
-│                         FRONTEND LAYER                                  │
-│                                                                         │
-│  ┌──────────────────┐   ┌──────────────────┐   ┌────────────────────┐  │
-│  │  Three.js Brain  │   │  Live Events     │   │  Landing Page      │  │
-│  │  Visualization   │   │  Feed            │   │                    │  │
-│  │                  │   │                  │   │  GitHub Pages      │  │
-│  │  localhost:3000  │   │  • anomaly alerts│   │  ashish-doing.     │  │
-│  │                  │   │  • node inspector│   │  github.io/        │  │
-│  │  • node pulses   │   │  • trust scores  │   │  agentwatch        │  │
-│  │  • anomaly glow  │   │  • Foundation-   │   │                    │  │
-│  │  • trust colors  │   │    Sec panel     │   │                    │  │
-│  └──────────────────┘   └──────────────────┘   └────────────────────┘  │
-└─────────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph AGENT["🤖 AI AGENT LAYER"]
+        LG["LangGraph Demo Agent\n━━━━━━━━━━━━━━━\n• normal mode\n• loop mode\n• hallucinate\n• drift mode"]
+        OT["OpenTelemetry\n━━━━━━━━━━━━━━━\n• traces & spans\n• trust scores\n• token counts"]
+        FS["Foundation-Sec-1.1-8B\n━━━━━━━━━━━━━━━\n• Splunk hosted model\n• rule-based reasoning\n• Explain This button"]
+        LG -->|instruments| OT
+    end
+
+    subgraph BACKEND["⚙️ BACKEND LAYER"]
+        API["FastAPI\n━━━━━━━━━━━━━━━\n• REST API\n• /run /search\n• /anomalies /explain"]
+        WS["Event Stream\n━━━━━━━━━━━━━━━\n• WebSocket\n• real-time push\n• 500-event buffer"]
+        SC["SplunkClient\n━━━━━━━━━━━━━━━\n• HEC indexing\n• SPL search\n• AI Assistant NL→SPL"]
+        API -->|fan-out| WS
+    end
+
+    subgraph SPLUNK["☁️ SPLUNK PLATFORM"]
+        HEC["HEC Ingest\n━━━━━━━━━━━━━━━\nindex: agentwatch\nsourcetype:\nagentwatch:otel\n1,269+ events"]
+        AITK["AI Toolkit\n━━━━━━━━━━━━━━━\nanomaly detection\n• tool call frequency\n• time-series analysis"]
+        MCP["MCP Server\n━━━━━━━━━━━━━━━\n• NL queries\n• SPL generation"]
+        DASH["Splunk Dashboard — 8 Panels\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nKPI · Anomaly table · Trust heatmap · Loop detection\nToken usage · Latency drift · Event log · Trust by tool"]
+        HEC --> AITK
+        HEC --> MCP
+        AITK --> DASH
+        MCP --> DASH
+    end
+
+    subgraph FRONTEND["🖥️ FRONTEND LAYER"]
+        BRAIN["Three.js Brain\n━━━━━━━━━━━━━━━\nlocalhost:3000\n• node pulses\n• anomaly glow\n• trust colors"]
+        FEED["Live Events Feed\n━━━━━━━━━━━━━━━\n• anomaly alerts\n• node inspector\n• Foundation-Sec panel"]
+        LAND["Landing Page\n━━━━━━━━━━━━━━━\nGitHub Pages\nashish-doing.\ngithub.io/agentwatch"]
+    end
+
+    OT -->|HEC POST| HEC
+    OT -->|events| API
+    API --> SC
+    SC -->|SPL queries| MCP
+    WS -->|WebSocket| BRAIN
+    WS --> FEED
+    FS --> FEED
 ```
 
 ---
 
 ## Data Flow
 
-```
-Agent run triggered
-        │
-        ▼
-LangGraph executes steps (normal / loop / hallucinate / drift)
-        │
-        ▼
-demo_agent.py sends events directly → Splunk HEC
-        │
-        ├──▶ Splunk agentwatch index
-        │           │
-        │           ├──▶ Dashboard panels (8 panels, 30d range)
-        │           ├──▶ AI Toolkit anomalydetection
-        │           └──▶ MCP Server NL queries
-        │
-        └──▶ Anomaly detected → Foundation-Sec "Explain This"
-                                plain English + recommended fix + SPL
+```mermaid
+sequenceDiagram
+    participant Agent as LangGraph Agent
+    participant HEC as Splunk HEC
+    participant Splunk as Splunk Dashboard
+    participant Brain as Three.js Brain
+    participant FS as Foundation-Sec
 
-Browser connects to localhost:3000
-        │
-        ▼
-websocket.js tries ws://localhost:8001/ws/browser
-        │
-        ├── Connected → real events from FastAPI
-        └── Failed    → demo simulation auto-starts
-                        (loop anomaly, trust degradation, alerts)
+    Agent->>HEC: tool_call event (trust_score, trace_id)
+    Agent->>HEC: llm_call event (tokens, latency)
+    Agent->>HEC: anomaly event (loop detected, trust=0.05)
+    HEC->>Splunk: Index to agentwatch
+    Splunk->>Splunk: anomalydetection command fires
+    Splunk-->>Brain: WebSocket demo simulation
+    Brain->>Brain: Node pulses red 🔴
+    Brain->>FS: Click "Explain This"
+    FS-->>Brain: Root cause + recommended fix
 ```
 
 ---
