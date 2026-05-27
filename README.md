@@ -17,9 +17,10 @@
 
 <p align="center">
   🌐 <a href="https://ashish-doing.github.io/agentwatch">Landing Page</a> &nbsp;•&nbsp;
-  📁 <a href="https://github.com/ashish-doing/agentwatch">GitHub</a> &nbsp;•&nbsp;
+
   🚀 <a href="#-quick-start">Quick Start</a> &nbsp;•&nbsp;
-  🏗️ <a href="#-architecture">Architecture</a>
+  🏗️ <a href="#-architecture">Architecture</a> &nbsp;•&nbsp;
+  📋 <a href="architecture_diagram.md">Full Diagram</a>
 </p>
 
 ---
@@ -28,7 +29,7 @@
 
 ### 🧠 Live Brain Visualization — Loop Anomaly Detected
 ![AgentWatch brain visualization showing live anomaly detection with Foundation-Sec explanation](docs/screenshots/screenshot-hero.png)
-*Real-time Three.js brain catches a loop anomaly (search_tool called 23x) with Foundation-Sec AI explanation*
+*510 events · 42 anomalies · Loop detected — search_tool called 23x · Foundation-Sec root cause + fix recommendation*
 
 ### 📊 Splunk Dashboard — Real Telemetry Data
 ![AgentWatch Splunk dashboard showing 1269 events, 180 anomalies, 59.7% trust score](docs/screenshots/screenshot-dashboard-top.png)
@@ -229,13 +230,13 @@ python backend/agent/agent_runner.py --mode drift
 
 ```spl
 -- Find all loop anomalies
-index=agentwatch event_type=tool_call earliest=-30d
+index=agentwatch event_type=tool_call earliest=-24h
 | stats count as call_count by agent_id, tool_name, trace_id
 | where call_count > 5
 | sort -call_count
 
 -- Token spike detection
-index=agentwatch event_type=llm_call earliest=-30d
+index=agentwatch event_type=llm_call earliest=-24h
 | stats max(llm_total_tokens) as max_tokens by step_name, trace_id
 | where max_tokens > 3000
 | sort -max_tokens
