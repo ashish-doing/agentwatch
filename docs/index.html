@@ -53,6 +53,7 @@
     }
     .hero::after {
       content: ''; position: absolute; inset: 0;
+      pointer-events: none;
       background-image: linear-gradient(rgba(0,229,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,229,255,0.03) 1px, transparent 1px);
       background-size: 60px 60px;
       mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black, transparent);
@@ -65,7 +66,7 @@
     .hero-title .accent { background: linear-gradient(135deg, var(--red), var(--orange)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 0.4em; letter-spacing: 8px; display: block; margin-bottom: 8px; }
     .hero-sub { font-size: clamp(16px, 2vw, 20px); color: var(--dim); max-width: 600px; line-height: 1.7; margin-bottom: 48px; animation: fadeUp 0.6s 0.2s ease both; }
     .hero-sub strong { color: var(--text); }
-    .hero-buttons { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; animation: fadeUp 0.6s 0.3s ease both; }
+    .hero-buttons { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; animation: fadeUp 0.6s 0.3s ease both; position: relative; z-index: 2; }
     .btn-primary { display: inline-flex; align-items: center; gap: 8px; background: var(--cyan); color: var(--bg); padding: 14px 32px; border-radius: 4px; font-weight: 700; font-size: 14px; letter-spacing: 1px; text-transform: uppercase; text-decoration: none; transition: all 0.2s; }
     .btn-primary:hover { background: #fff; transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,229,255,0.3); }
     .btn-secondary { display: inline-flex; align-items: center; gap: 8px; background: transparent; color: var(--text); padding: 14px 32px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.1); font-size: 14px; letter-spacing: 1px; text-transform: uppercase; text-decoration: none; transition: all 0.2s; }
