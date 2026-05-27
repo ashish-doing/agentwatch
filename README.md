@@ -16,10 +16,10 @@
 </p>
 
 <p align="center">
-  <a href="https://ashish-doing.github.io/agentwatch">🌐 Landing Page</a> &nbsp;•&nbsp;
-  <a href="https://github.com/ashish-doing/agentwatch">📁 GitHub</a> &nbsp;•&nbsp;
-  <a href="#-quick-start">🚀 Quick Start</a> &nbsp;•&nbsp;
-  <a href="#-architecture">🏗️ Architecture</a>
+  🌐 <a href="https://ashish-doing.github.io/agentwatch">Landing Page</a> &nbsp;•&nbsp;
+  📁 <a href="https://github.com/ashish-doing/agentwatch">GitHub</a> &nbsp;•&nbsp;
+  🚀 <a href="#-quick-start">Quick Start</a> &nbsp;•&nbsp;
+  🏗️ <a href="#-architecture">Architecture</a>
 </p>
 
 ---
@@ -229,13 +229,13 @@ python backend/agent/agent_runner.py --mode drift
 
 ```spl
 -- Find all loop anomalies
-index=agentwatch event_type=tool_call earliest=-24h
+index=agentwatch event_type=tool_call earliest=-30d
 | stats count as call_count by agent_id, tool_name, trace_id
 | where call_count > 5
 | sort -call_count
 
 -- Token spike detection
-index=agentwatch event_type=llm_call earliest=-24h
+index=agentwatch event_type=llm_call earliest=-30d
 | stats max(llm_total_tokens) as max_tokens by step_name, trace_id
 | where max_tokens > 3000
 | sort -max_tokens
