@@ -17,6 +17,7 @@ from pydantic import BaseModel
 from .splunk_client import SplunkClient
 from .foundation_sec import FoundationSecClient
 from ..instrumentation.anomaly_detector import AnomalyDetector
+from .autopsy import run_autopsy
 
 logger = logging.getLogger("agentwatch.api")
 
@@ -188,6 +189,33 @@ async def get_stats():
         "anomaly_breakdown": detector_stats["anomaly_breakdown"],
     }
 
+class AutopsyRequest(BaseModel):
+      trace_id: Optional[str] = None
+      last_n_events: int = 200
+ 
+ 
+@app.post("/api/autopsy")
+async def get_autopsy(req: AutopsyRequest):
+      """
+      Post-run agent autopsy — sends full trace to Foundation-Sec
+      and returns a structured diagnostic report.
+      """
+      try:
+          events = list(event_buffer)
+          if req.trace_id:
+              events = [e for e in events if e.get("trace_id") == req.trace_id]
+          else:
+              events = events[-req.last_n_events:]
+ 
+          if not events:
+              raise HTTPException(status_code=404, detail="No events found for this trace")
+ 
+          result = await run_autopsy(events, foundation_sec)
+          return result
+      except HTTPException:
+          raise
+      except Exception as e:
+          raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/api/health")
 async def health():

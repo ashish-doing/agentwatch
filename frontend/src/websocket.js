@@ -10,6 +10,8 @@
 
 import { updateHealthScore } from './health_score.js';
 import { initSparklines, pushSparklineEvent } from './sparklines.js';
+import { initTimeline, pushTimelineEvent } from './trace_timeline.js';
+import { checkRunComplete } from './autopsy_panel.js';
 import { addOrUpdateNode } from './brain.js';
 import { showAnomalyAlert } from './alerts.js';
 
@@ -37,6 +39,7 @@ function connect() {
     reconnectDelay = 1000;
     console.log('[AgentWatch] WebSocket connected');
     initSparklines();
+    initTimeline();
 
     // Heartbeat
     setInterval(() => {
@@ -91,6 +94,8 @@ function handleEvent(event, showAlerts = true) {
   eventCount++;
   updateHealthScore(event);
   pushSparklineEvent(event);
+  pushTimelineEvent(event);
+  checkRunComplete(event);
 
   // Route to Three.js brain
   addOrUpdateNode(event);
