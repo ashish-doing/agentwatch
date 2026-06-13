@@ -368,6 +368,11 @@ if FRONTEND_DIR.exists():
     @app.get("/ops")
     async def serve_ops():
         ops_path = FRONTEND_DIR / "ops.html"
-        return FileResponse(str(ops_path))    
+        return FileResponse(str(ops_path))
+
+    @app.get("/topology")
+    async def serve_topology():
+        return FileResponse(str(FRONTEND_DIR / "topology.html"))
+        
 else:
     logger.warning(f"Frontend directory not found at {FRONTEND_DIR} — static serving disabled.")

@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AgentWatch — Agent Topology</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <style>
+    :root {
+      --bg: #050810;
+      --panel: rgba(8, 14, 30, 0.88);
+      --border: rgba(100, 160, 255, 0.13);
+      --border-bright: rgba(100, 160, 255, 0.28);
+      --accent: #4f8fff;
+      --accent2: #00e5ff;
+      --green: #00ff88;
+      --yellow: #ffcc00;
+      --orange: #ff8800;
+      --red: #ff3355;
+      --purple: #bf5fff;
+      --text: #c8d8f0;
+      --text-dim: #5a7090;
+      --mono: 'Space Mono', monospace;
+      --sans: 'Syne', sans-serif;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--mono);
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+    }
+    #canvas-container {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+    }
+    /* ── Nav ── */
+    #topnav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      height: 52px;
+      background: rgba(5,8,16,0.95);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(16px);
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      gap: 24px;
+    }
+    .nav-logo {
+      font-family: var(--sans);
+      font-size: 17px;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--accent2), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-decoration: none;
+    }
+    .nav-link {
+      font-size: 9px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      text-decoration: none;
+      padding: 5px 12px;
+      border-radius: 5px;
+      border: 1px solid transparent;
+      transition: all 0.15s;
+    }
+    .nav-link:hover { color: var(--text); border-color: var(--border); }
+    .nav-link.active {
+      color: var(--accent2);
+      background: rgba(0,229,255,0.07);
+      border-color: rgba(0,229,255,0.2);
+    }
+    .nav-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+    .live-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--green);
+      animation: blink 2s infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+
+    /* ── Left legend panel ── */
+    #legend {
+      position: fixed;
+      top: 68px;
+      left: 12px;
+      z-index: 50;
+      width: 220px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .leg-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 16px;
+      backdrop-filter: blur(12px);
+    }
+    .leg-title {
+      font-size: 8px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 10px;
+    }
+    .leg-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+      font-size: 9px;
+      color: var(--text);
+    }
+    .leg-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+    .leg-line {
+      width: 24px; height: 2px;
+      flex-shrink: 0;
+      border-radius: 1px;
+    }
+
+    /* ── Right inspector ── */
+    #inspector {
+      position: fixed;
+      top: 68px;
+      right: 12px;
+      z-index: 50;
+      width: 260px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      backdrop-filter: blur(12px);
+      overflow: hidden;
+    }
+    .insp-header {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      font-size: 9px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+    #insp-body {
+      padding: 14px;
+      font-size: 10px;
+      line-height: 1.8;
+    }
+    .insp-empty {
+      color: var(--text-dim);
+      font-size: 9px;
+      text-align: center;
+      padding: 20px 0;
+      line-height: 2;
+    }
+    .insp-field { margin-bottom: 10px; }
+    .insp-label {
+      font-size: 8px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 3px;
+    }
+    .insp-val { color: var(--text); font-size: 11px; }
+    .trust-bar {
+      height: 3px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 2px;
+      margin-top: 4px;
+      overflow: hidden;
+    }
+    .trust-fill { height: 100%; border-radius: 2px; transition: width 0.4s; }
+
+    /* ── Bottom stats bar ── */
+    #stats-bar {
+      position: fixed;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 50;
+      display: flex;
+      gap: 8px;
+    }
+    .stat-chip {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 16px;
+      text-align: center;
+      backdrop-filter: blur(10px);
+      min-width: 80px;
+    }
+    .stat-val {
+      font-family: var(--sans);
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--accent2);
+      line-height: 1;
+    }
+    .stat-lbl {
+      font-size: 8px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-top: 3px;
+    }
+
+    /* ── Controls ── */
+    #controls {
+      position: fixed;
+      bottom: 12px;
+      right: 12px;
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .ctrl-btn {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: 8px 14px;
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .ctrl-btn:hover { border-color: var(--accent); color: var(--accent2); }
+    .ctrl-btn.active { border-color: var(--accent2); color: var(--accent2); background: rgba(0,229,255,0.07); }
+
+    /* ── Tooltip ── */
+    #tooltip {
+      position: fixed;
+      z-index: 200;
+      background: rgba(5,8,16,0.97);
+      border: 1px solid var(--border-bright);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 9px;
+      color: var(--text);
+      pointer-events: none;
+      display: none;
+      line-height: 1.8;
+      backdrop-filter: blur(12px);
+    }
+
+    /* ── Pulse rings (CSS, for selected node) ── */
+    @keyframes ring-pulse {
+      0% { transform: scale(1); opacity: 0.8; }
+      100% { transform: scale(2.5); opacity: 0; }
+    }
+
+    /* ── Event flash log ── */
+    #event-log {
+      position: fixed;
+      bottom: 68px;
+      left: 12px;
+      width: 220px;
+      z-index: 50;
+    }
+    .ev-item {
+      background: rgba(8,14,30,0.85);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 6px 10px;
+      font-size: 9px;
+      color: var(--text-dim);
+      margin-bottom: 4px;
+      animation: ev-in 0.2s ease;
+      border-left: 2px solid var(--border);
+    }
+    @keyframes ev-in {
+      from { opacity:0; transform: translateX(-8px); }
+      to { opacity:1; transform: translateX(0); }
+    }
+    .ev-item.anomaly { border-left-color: var(--red); color: var(--red); }
+    .ev-item.tool_call { border-left-color: var(--accent2); }
+    .ev-item.llm_call { border-left-color: var(--accent); }
+  </style>
+</head>
+<body>
+
+<div id="canvas-container"></div>
+
+<!-- Nav -->
+<nav id="topnav">
+  <a class="nav-logo" href="/">AgentWatch</a>
+  <a class="nav-link" href="/">Live Brain</a>
+  <a class="nav-link" href="/ops">Agent Ops</a>
+  <a class="nav-link active" href="/topology">Topology</a>
+  <div class="nav-right">
+    <div class="live-dot"></div>
+    <span id="conn-label" style="font-size:9px;letter-spacing:1px;color:var(--text-dim)">Connecting</span>
+  </div>
+</nav>
+
+<!-- Legend -->
+<div id="legend">
+  <div class="leg-card">
+    <div class="leg-title">Node Types</div>
+    <div class="leg-row"><div class="leg-dot" style="background:#4f8fff"></div>LLM Call</div>
+    <div class="leg-row"><div class="leg-dot" style="background:#00e5ff"></div>Tool Call</div>
+    <div class="leg-row"><div class="leg-dot" style="background:#00ff88"></div>Step (Healthy)</div>
+    <div class="leg-row"><div class="leg-dot" style="background:#ffcc00"></div>Step (Warning)</div>
+    <div class="leg-row"><div class="leg-dot" style="background:#ff3355"></div>Anomaly / Error</div>
+    <div class="leg-row"><div class="leg-dot" style="background:#bf5fff;width:16px;height:16px"></div>Agent Hub</div>
+  </div>
+  <div class="leg-card">
+    <div class="leg-title">Edge Types</div>
+    <div class="leg-row"><div class="leg-line" style="background:rgba(0,229,255,0.5)"></div>Data Flow</div>
+    <div class="leg-row"><div class="leg-line" style="background:rgba(255,51,85,0.5)"></div>Anomaly Path</div>
+    <div class="leg-row"><div class="leg-line" style="background:rgba(0,255,136,0.3)"></div>Completion</div>
+  </div>
+</div>
+
+<!-- Event log -->
+<div id="event-log"></div>
+
+<!-- Inspector -->
+<div id="inspector">
+  <div class="insp-header">Node Inspector</div>
+  <div id="insp-body">
+    <div class="insp-empty">Click a node<br>to inspect it</div>
+  </div>
+</div>
+
+<!-- Stats bar -->
+<div id="stats-bar">
+  <div class="stat-chip">
+    <div class="stat-val" id="s-agents">0</div>
+    <div class="stat-lbl">Agents</div>
+  </div>
+  <div class="stat-chip">
+    <div class="stat-val" id="s-nodes">0</div>
+    <div class="stat-lbl">Nodes</div>
+  </div>
+  <div class="stat-chip">
+    <div class="stat-val" id="s-edges">0</div>
+    <div class="stat-lbl">Edges</div>
+  </div>
+  <div class="stat-chip">
+    <div class="stat-val" id="s-anomalies" style="color:var(--red)">0</div>
+    <div class="stat-lbl">Anomalies</div>
+  </div>
+  <div class="stat-chip">
+    <div class="stat-val" id="s-trust">—</div>
+    <div class="stat-lbl">Avg Trust</div>
+  </div>
+</div>
+
+<!-- Controls -->
+<div id="controls">
+  <button class="ctrl-btn" onclick="triggerDemo('loop')">▶ Loop Demo</button>
+  <button class="ctrl-btn" onclick="triggerDemo('drift')">▶ Drift Demo</button>
+  <button class="ctrl-btn" id="btn-reset" onclick="resetCamera()">⊕ Reset View</button>
+  <button class="ctrl-btn" id="btn-labels" onclick="toggleLabels()">⊙ Labels</button>
+</div>
+
+<div id="tooltip"></div>
+
+<script>
+// ══════════════════════════════════════════════════════════════
+// AgentWatch — Multi-Agent Topology Map
+// Three.js r128 force-directed graph, fully independent of brain.js
+// ══════════════════════════════════════════════════════════════
+
+const API_BASE = (() => {
+  if (window.location.port === '3000') return 'http://localhost:8001';
+  return window.location.origin;
+})();
+
+// ── Scene setup ───────────────────────────────────────────────
+const W = window.innerWidth, H = window.innerHeight;
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+renderer.setSize(W, H);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setClearColor(0x050810, 1);
+document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(60, W / H, 0.1, 2000);
+camera.position.set(0, 0, 280);
+
+// Fog for depth
+scene.fog = new THREE.FogExp2(0x050810, 0.0018);
+
+// ── Lights ────────────────────────────────────────────────────
+const ambient = new THREE.AmbientLight(0x223366, 0.8);
+scene.add(ambient);
+const pointA = new THREE.PointLight(0x4f8fff, 1.2, 400);
+pointA.position.set(100, 100, 100);
+scene.add(pointA);
+const pointB = new THREE.PointLight(0xff3355, 0.6, 300);
+pointB.position.set(-100, -80, 50);
+scene.add(pointB);
+
+// ── Star field background ──────────────────────────────────────
+(function addStars() {
+  const geo = new THREE.BufferGeometry();
+  const positions = [];
+  for (let i = 0; i < 1200; i++) {
+    positions.push((Math.random()-0.5)*1400, (Math.random()-0.5)*1400, (Math.random()-0.5)*600 - 300);
+  }
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  const mat = new THREE.PointsMaterial({ color: 0x4466aa, size: 0.6, transparent: true, opacity: 0.5 });
+  scene.add(new THREE.Points(geo, mat));
+})();
+
+// ── Graph state ───────────────────────────────────────────────
+let nodes = [];   // { id, mesh, label, type, trust, agentId, velocity, force }
+let edges = [];   // { from, to, line, type }
+let agentHubs = {}; // agentId → hub node
+let showLabels = true;
+let selectedNode = null;
+let animating = true;
+
+// ── Colors ────────────────────────────────────────────────────
+const COLORS = {
+  agent:        0xbf5fff,
+  llm_call:     0x4f8fff,
+  tool_call:    0x00e5ff,
+  step_healthy: 0x00ff88,
+  step_warn:    0xffcc00,
+  anomaly:      0xff3355,
+  error:        0xff8800,
+  splunk:       0x00ff88,
+};
+
+function trustToColor(t) {
+  if (t >= 0.8) return COLORS.step_healthy;
+  if (t >= 0.5) return COLORS.step_warn;
+  if (t >= 0.3) return COLORS.error;
+  return COLORS.anomaly;
+}
+
+// ── Node creation ─────────────────────────────────────────────
+function makeNode(opts) {
+  const { id, type, trust = 1.0, agentId = 'demo', label = '' } = opts;
+
+  const isHub = type === 'agent';
+  const radius = isHub ? 9 : type === 'llm_call' ? 5 : type === 'anomaly' ? 6 : 4;
+  const color = type === 'agent' ? COLORS.agent
+              : type === 'anomaly' ? COLORS.anomaly
+              : type === 'llm_call' ? COLORS.llm_call
+              : type === 'tool_call' ? COLORS.tool_call
+              : trustToColor(trust);
+
+  const geo = isHub
+    ? new THREE.OctahedronGeometry(radius, 1)
+    : new THREE.SphereGeometry(radius, 16, 12);
+
+  const mat = new THREE.MeshPhongMaterial({
+    color,
+    emissive: color,
+    emissiveIntensity: isHub ? 0.35 : 0.2,
+    transparent: true,
+    opacity: 0.9,
+    shininess: 80,
+  });
+
+  const mesh = new THREE.Mesh(geo, mat);
+  // Scatter randomly, hubs near center
+  mesh.position.set(
+    (Math.random()-0.5) * (isHub ? 80 : 200),
+    (Math.random()-0.5) * (isHub ? 80 : 160),
+    (Math.random()-0.5) * 60
+  );
+
+  // Glow ring for anomaly nodes
+  if (type === 'anomaly') {
+    const ringGeo = new THREE.RingGeometry(radius + 2, radius + 4, 32);
+    const ringMat = new THREE.MeshBasicMaterial({
+      color: COLORS.anomaly, transparent: true, opacity: 0.4,
+      side: THREE.DoubleSide
+    });
+    const ring = new THREE.Mesh(ringGeo, ringMat);
+    mesh.add(ring);
+  }
+
+  scene.add(mesh);
+
+  // Sprite label
+  const sprite = makeLabel(label || type, color);
+  sprite.position.set(0, radius + 6, 0);
+  sprite.visible = showLabels;
+  mesh.add(sprite);
+
+  const node = {
+    id, mesh, sprite, type, trust, agentId, label,
+    color,
+    velocity: new THREE.Vector3(
+      (Math.random()-0.5)*0.2, (Math.random()-0.5)*0.2, (Math.random()-0.5)*0.1
+    ),
+    force: new THREE.Vector3(),
+  };
+
+  nodes.push(node);
+  return node;
+}
+
+// ── Sprite text label ─────────────────────────────────────────
+function makeLabel(text, color = 0x00e5ff) {
+  const canvas = document.createElement('canvas');
+  canvas.width = 256; canvas.height = 64;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0,0,256,64);
+  const hex = '#' + color.toString(16).padStart(6,'0');
+  ctx.font = 'bold 22px monospace';
+  ctx.fillStyle = hex;
+  ctx.globalAlpha = 0.85;
+  ctx.textAlign = 'center';
+  ctx.fillText(text.slice(0,20), 128, 40);
+  const tex = new THREE.CanvasTexture(canvas);
+  const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: false });
+  const sprite = new THREE.Sprite(mat);
+  sprite.scale.set(32, 8, 1);
+  return sprite;
+}
+
+// ── Edge creation ─────────────────────────────────────────────
+function makeEdge(fromNode, toNode, type = 'flow') {
+  const color = type === 'anomaly' ? 0xff3355 : type === 'completion' ? 0x00ff88 : 0x00e5ff;
+  const points = [fromNode.mesh.position.clone(), toNode.mesh.position.clone()];
+  const geo = new THREE.BufferGeometry().setFromPoints(points);
+  const mat = new THREE.LineBasicMaterial({
+    color, transparent: true,
+    opacity: type === 'anomaly' ? 0.7 : 0.3,
+    linewidth: 1,
+  });
+  const line = new THREE.Line(geo, mat);
+  scene.add(line);
+  const edge = { from: fromNode, to: toNode, line, type, geo };
+  edges.push(edge);
+  return edge;
+}
+
+function updateEdgeGeometry(edge) {
+  const pts = [edge.from.mesh.position.clone(), edge.to.mesh.position.clone()];
+  edge.geo.setFromPoints(pts);
+  edge.geo.attributes.position.needsUpdate = true;
+}
+
+// ── Force-directed layout ─────────────────────────────────────
+const REPULSION = 1800;
+const ATTRACTION = 0.012;
+const DAMPING = 0.85;
+const CENTER_PULL = 0.004;
+
+function applyForces() {
+  // Reset forces
+  nodes.forEach(n => n.force.set(0,0,0));
+
+  // Repulsion between all node pairs
+  for (let i = 0; i < nodes.length; i++) {
+    for (let j = i+1; j < nodes.length; j++) {
+      const a = nodes[i], b = nodes[j];
+      const diff = new THREE.Vector3().subVectors(a.mesh.position, b.mesh.position);
+      const dist = Math.max(diff.length(), 8);
+      const f = REPULSION / (dist * dist);
+      diff.normalize().multiplyScalar(f);
+      a.force.add(diff);
+      b.force.sub(diff);
+    }
+  }
+
+  // Attraction along edges
+  edges.forEach(e => {
+    const diff = new THREE.Vector3().subVectors(e.to.mesh.position, e.from.mesh.position);
+    const dist = diff.length();
+    const f = dist * ATTRACTION;
+    diff.normalize().multiplyScalar(f);
+    e.from.force.add(diff);
+    e.to.force.sub(diff);
+  });
+
+  // Center gravity (hub nodes pull to center harder)
+  nodes.forEach(n => {
+    const pull = n.type === 'agent' ? CENTER_PULL * 3 : CENTER_PULL;
+    n.force.add(n.mesh.position.clone().negate().multiplyScalar(pull));
+  });
+
+  // Integrate
+  nodes.forEach(n => {
+    n.velocity.add(n.force).multiplyScalar(DAMPING);
+    n.velocity.clampLength(0, 2.5);
+    n.mesh.position.add(n.velocity);
+    // Clamp Z
+    n.mesh.position.z = Math.max(-60, Math.min(60, n.mesh.position.z));
+  });
+}
+
+// ── Build graph from events ───────────────────────────────────
+function buildGraph(events) {
+  // Clear old
+  nodes.forEach(n => { scene.remove(n.mesh); });
+  edges.forEach(e => { scene.remove(e.line); });
+  nodes = []; edges = []; agentHubs = {};
+
+  // Group by agentId then traceId
+  const agentMap = {};
+  events.forEach(ev => {
+    const aid = ev.agent_id || 'demo-agent';
+    if (!agentMap[aid]) agentMap[aid] = {};
+    const tid = ev.trace_id || 'unknown';
+    if (!agentMap[aid][tid]) agentMap[aid][tid] = [];
+    agentMap[aid][tid].push(ev);
+  });
+
+  Object.entries(agentMap).forEach(([agentId, traces]) => {
+    // Create agent hub
+    const hub = makeNode({ id: `agent:${agentId}`, type: 'agent', agentId, label: agentId.slice(0,10) });
+    agentHubs[agentId] = hub;
+
+    Object.entries(traces).forEach(([traceId, tevents]) => {
+      let prevNode = hub;
+      let seenTypes = {};
+
+      tevents.slice(0, 18).forEach((ev, i) => {
+        const trust = parseFloat(ev.trust_score ?? 1.0);
+        const type = ev.event_type === 'anomaly' ? 'anomaly'
+                   : ev.event_type === 'llm_call' ? 'llm_call'
+                   : ev.event_type === 'tool_call' ? 'tool_call'
+                   : trust < 0.3 ? 'anomaly'
+                   : trust < 0.6 ? 'step_warn'
+                   : 'step_healthy';
+
+        const nodeId = `${traceId}:${i}`;
+        const label = ev.step_name || ev.tool_name || ev.event_type || '';
+        const node = makeNode({ id: nodeId, type, trust, agentId, label });
+
+        // Edge from prev → this node
+        const edgeType = type === 'anomaly' ? 'anomaly'
+                       : i === tevents.length-1 ? 'completion' : 'flow';
+        makeEdge(prevNode, node, edgeType);
+        prevNode = node;
+      });
+    });
+  });
+
+  // Connect agent hubs to each other if multiple agents
+  const hubs = Object.values(agentHubs);
+  for (let i = 0; i < hubs.length-1; i++) {
+    makeEdge(hubs[i], hubs[i+1], 'flow');
+  }
+
+  updateStats();
+}
+
+// ── Stats ─────────────────────────────────────────────────────
+function updateStats() {
+  document.getElementById('s-agents').textContent = Object.keys(agentHubs).length;
+  document.getElementById('s-nodes').textContent = nodes.length;
+  document.getElementById('s-edges').textContent = edges.length;
+  const anomCount = nodes.filter(n => n.type === 'anomaly').length;
+  document.getElementById('s-anomalies').textContent = anomCount;
+  const trusts = nodes.filter(n => n.trust < 1.0 && n.type !== 'agent');
+  const avgTrust = trusts.length
+    ? (trusts.reduce((s,n)=>s+n.trust,0)/trusts.length)
+    : 1.0;
+  const el = document.getElementById('s-trust');
+  el.textContent = `${Math.round(avgTrust*100)}%`;
+  el.style.color = avgTrust > 0.7 ? 'var(--green)' : avgTrust > 0.4 ? 'var(--yellow)' : 'var(--red)';
+}
+
+// ── Raycasting / click ────────────────────────────────────────
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+const tooltip = document.getElementById('tooltip');
+
+renderer.domElement.addEventListener('mousemove', (e) => {
+  mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+  mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+  raycaster.setFromCamera(mouse, camera);
+  const meshes = nodes.map(n => n.mesh);
+  const hits = raycaster.intersectObjects(meshes);
+  if (hits.length > 0) {
+    const node = nodes.find(n => n.mesh === hits[0].object);
+    if (node) {
+      tooltip.style.display = 'block';
+      tooltip.style.left = (e.clientX + 14) + 'px';
+      tooltip.style.top = (e.clientY - 10) + 'px';
+      tooltip.innerHTML = `
+        <div style="color:var(--accent2);font-weight:700;margin-bottom:4px">${node.label || node.type}</div>
+        <div>Type: <span style="color:var(--text)">${node.type}</span></div>
+        <div>Agent: <span style="color:var(--text)">${node.agentId}</span></div>
+        <div>Trust: <span style="color:${node.trust>0.7?'#00ff88':node.trust>0.4?'#ffcc00':'#ff3355'}">${Math.round(node.trust*100)}%</span></div>
+      `;
+    }
+  } else {
+    tooltip.style.display = 'none';
+  }
+});
+
+renderer.domElement.addEventListener('click', (e) => {
+  raycaster.setFromCamera(mouse, camera);
+  const hits = raycaster.intersectObjects(nodes.map(n => n.mesh));
+  if (hits.length > 0) {
+    const node = nodes.find(n => n.mesh === hits[0].object);
+    if (node) selectNode(node);
+  }
+});
+
+function selectNode(node) {
+  selectedNode = node;
+  // Highlight
+  nodes.forEach(n => {
+    n.mesh.material.emissiveIntensity = n === node ? 0.8 : 0.15;
+  });
+
+  // Inspector
+  const tc = node.trust > 0.7 ? '#00ff88' : node.trust > 0.4 ? '#ffcc00' : '#ff3355';
+  const pct = Math.round(node.trust * 100);
+  document.getElementById('insp-body').innerHTML = `
+    <div class="insp-field">
+      <div class="insp-label">Node Type</div>
+      <div class="insp-val">${node.type.replace('_',' ')}</div>
+    </div>
+    <div class="insp-field">
+      <div class="insp-label">Label</div>
+      <div class="insp-val" style="color:var(--accent2)">${node.label || '—'}</div>
+    </div>
+    <div class="insp-field">
+      <div class="insp-label">Agent ID</div>
+      <div class="insp-val">${node.agentId}</div>
+    </div>
+    <div class="insp-field">
+      <div class="insp-label">Trust Score</div>
+      <div class="insp-val" style="color:${tc}">${pct}%</div>
+      <div class="trust-bar"><div class="trust-fill" style="width:${pct}%;background:${tc}"></div></div>
+    </div>
+    <div class="insp-field">
+      <div class="insp-label">Connections</div>
+      <div class="insp-val">${edges.filter(e=>e.from===node||e.to===node).length} edges</div>
+    </div>
+    ${node.type === 'anomaly' ? `
+    <div style="margin-top:12px;padding:8px 10px;background:rgba(255,51,85,0.08);border:1px solid rgba(255,51,85,0.2);border-radius:6px;font-size:9px;color:var(--red)">
+      ⚠ Anomaly node — trust collapsed below threshold
+    </div>` : ''}
+  `;
+}
+
+// ── Orbit controls (manual) ───────────────────────────────────
+let isDragging = false, lastMouse = { x: 0, y: 0 };
+let spherical = { theta: 0, phi: Math.PI/2, r: 280 };
+
+renderer.domElement.addEventListener('mousedown', e => {
+  isDragging = true; lastMouse = { x: e.clientX, y: e.clientY };
+});
+renderer.domElement.addEventListener('mouseup', () => isDragging = false);
+renderer.domElement.addEventListener('mousemove', e => {
+  if (!isDragging) return;
+  const dx = (e.clientX - lastMouse.x) * 0.005;
+  const dy = (e.clientY - lastMouse.y) * 0.005;
+  spherical.theta -= dx;
+  spherical.phi = Math.max(0.3, Math.min(Math.PI - 0.3, spherical.phi + dy));
+  lastMouse = { x: e.clientX, y: e.clientY };
+  camera.position.set(
+    spherical.r * Math.sin(spherical.phi) * Math.sin(spherical.theta),
+    spherical.r * Math.cos(spherical.phi),
+    spherical.r * Math.sin(spherical.phi) * Math.cos(spherical.theta)
+  );
+  camera.lookAt(0, 0, 0);
+});
+renderer.domElement.addEventListener('wheel', e => {
+  spherical.r = Math.max(80, Math.min(600, spherical.r + e.deltaY * 0.3));
+  camera.position.normalize().multiplyScalar(spherical.r);
+  camera.lookAt(0, 0, 0);
+});
+
+function resetCamera() {
+  spherical = { theta: 0, phi: Math.PI/2, r: 280 };
+  camera.position.set(0, 0, 280);
+  camera.lookAt(0, 0, 0);
+}
+
+function toggleLabels() {
+  showLabels = !showLabels;
+  nodes.forEach(n => { if (n.sprite) n.sprite.visible = showLabels; });
+  const btn = document.getElementById('btn-labels');
+  btn.classList.toggle('active', showLabels);
+}
+
+// ── Animate nodes (pulse) ─────────────────────────────────────
+let tick = 0;
+function animateNodes() {
+  tick += 0.016;
+  nodes.forEach((n, i) => {
+    const base = n.type === 'agent' ? 1.0 : 0.95;
+    const speed = n.type === 'anomaly' ? 3 : n.type === 'agent' ? 1 : 1.5;
+    const amp = n.type === 'anomaly' ? 0.12 : 0.04;
+    const s = base + Math.sin(tick * speed + i * 0.7) * amp;
+    n.mesh.scale.setScalar(s);
+
+    // Rotate hubs
+    if (n.type === 'agent') {
+      n.mesh.rotation.y += 0.008;
+      n.mesh.rotation.x += 0.004;
+    }
+
+    // Emissive flicker for anomaly
+    if (n.type === 'anomaly') {
+      n.mesh.material.emissiveIntensity = 0.3 + Math.sin(tick * 4 + i) * 0.2;
+    }
+  });
+}
+
+// ── Particle flowing along edges ──────────────────────────────
+const particles = [];
+function spawnParticle(edge) {
+  const geo = new THREE.SphereGeometry(1.2, 6, 6);
+  const color = edge.type === 'anomaly' ? 0xff3355 : 0x00e5ff;
+  const mat = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.9 });
+  const mesh = new THREE.Mesh(geo, mat);
+  scene.add(mesh);
+  particles.push({ mesh, edge, t: 0, speed: 0.012 + Math.random()*0.008 });
+}
+
+function updateParticles() {
+  for (let i = particles.length-1; i >= 0; i--) {
+    const p = particles[i];
+    p.t += p.speed;
+    if (p.t >= 1) {
+      scene.remove(p.mesh);
+      particles.splice(i, 1);
+      continue;
+    }
+    p.mesh.position.lerpVectors(p.edge.from.mesh.position, p.edge.to.mesh.position, p.t);
+    p.mesh.material.opacity = Math.sin(p.t * Math.PI) * 0.9;
+  }
+}
+
+// Spawn particles periodically
+setInterval(() => {
+  if (edges.length === 0) return;
+  const edge = edges[Math.floor(Math.random() * edges.length)];
+  spawnParticle(edge);
+}, 300);
+
+// ── Render loop ───────────────────────────────────────────────
+function animate() {
+  requestAnimationFrame(animate);
+  if (animating) applyForces();
+  edges.forEach(updateEdgeGeometry);
+  animateNodes();
+  updateParticles();
+  renderer.render(scene, camera);
+}
+animate();
+
+// ── Resize ────────────────────────────────────────────────────
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+// ── WebSocket live feed ───────────────────────────────────────
+let ws = null;
+let wsEvents = [];
+let rebuildDebounce = null;
+
+function connectWS() {
+  const url = API_BASE.replace('http','ws') + '/ws/browser';
+  ws = new WebSocket(url);
+  ws.onopen = () => { document.getElementById('conn-label').textContent = 'Live'; };
+  ws.onmessage = (msg) => {
+    try {
+      const payload = JSON.parse(msg.data);
+      if (payload.type === 'replay') {
+        wsEvents = payload.events || [];
+        buildGraph(wsEvents);
+        logEvent({ event_type: 'system', step_name: `Loaded ${wsEvents.length} events` });
+      } else if (payload.type === 'event') {
+        const ev = payload.data;
+        wsEvents.push(ev);
+        if (wsEvents.length > 500) wsEvents.shift();
+        logEvent(ev);
+        // Debounce graph rebuild so we don't rebuild on every single event
+        clearTimeout(rebuildDebounce);
+        rebuildDebounce = setTimeout(() => buildGraph(wsEvents), 1200);
+      }
+    } catch(e) {}
+  };
+  ws.onclose = () => {
+    document.getElementById('conn-label').textContent = 'Reconnecting...';
+    setTimeout(connectWS, 3000);
+  };
+  ws.onerror = () => ws.close();
+}
+
+// ── Event log ─────────────────────────────────────────────────
+const logEl = document.getElementById('event-log');
+function logEvent(ev) {
+  const type = ev.event_type || 'system';
+  const name = ev.step_name || ev.tool_name || type;
+  const item = document.createElement('div');
+  item.className = `ev-item ${type}`;
+  item.textContent = `${type} · ${name.slice(0,22)}`;
+  logEl.insertBefore(item, logEl.firstChild);
+  while (logEl.children.length > 6) logEl.removeChild(logEl.lastChild);
+  // Fade out after 4s
+  setTimeout(() => {
+    item.style.transition = 'opacity 0.5s';
+    item.style.opacity = '0';
+    setTimeout(() => item.remove(), 500);
+  }, 4000);
+}
+
+// ── Seed demo graph if no events ──────────────────────────────
+function seedDemoGraph() {
+  const modes = ['normal','loop','hallucinate','drift'];
+  const demoEvents = [];
+  modes.forEach((mode, mi) => {
+    const agentId = `agent-${mode}`;
+    const traceId = `demo-trace-${mi}`;
+    const steps = ['plan','search','validate','respond','finalize'];
+    steps.forEach((step, si) => {
+      const isLoop = mode === 'loop' && step === 'search';
+      const trust = mode === 'normal' ? 0.9
+                  : mode === 'loop' && si > 2 ? 0.1
+                  : mode === 'drift' ? Math.max(0.1, 0.9 - si*0.15)
+                  : 0.7;
+      demoEvents.push({
+        agent_id: agentId, trace_id: traceId, mode,
+        event_type: isLoop ? 'anomaly' : si % 2 === 0 ? 'tool_call' : 'llm_call',
+        step_name: step, tool_name: step,
+        trust_score: trust,
+        timestamp: Date.now()/1000 - (steps.length - si) * 2
+      });
+    });
+  });
+  buildGraph(demoEvents);
+  logEvent({ event_type: 'system', step_name: 'Demo graph loaded' });
+}
+
+// ── Demo trigger ──────────────────────────────────────────────
+async function triggerDemo(mode) {
+  logEvent({ event_type: 'system', step_name: `Starting ${mode} demo...` });
+  try {
+    await fetch(`${API_BASE}/api/demo/trigger`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mode }),
+    });
+  } catch(e) {}
+}
+
+// ── Boot ──────────────────────────────────────────────────────
+connectWS();
+// If WS doesn't replay within 2s, seed demo
+setTimeout(() => { if (nodes.length === 0) seedDemoGraph(); }, 2000);
+</script>
+</body>
+</html>
