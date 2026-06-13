@@ -15,6 +15,9 @@ Field names match exactly what langgraph_hooks.py emits:
   - step_name       (from AgentEvent.step_name)
 
 Used by main.py → broadcast_to_browsers() pipeline.
+
+TASK 2 addition: update_thresholds() lets main.py push live config changes
+from /api/config without restarting the process.
 """
 
 import time
@@ -25,12 +28,12 @@ from typing import Dict, List, Optional, Tuple
 
 logger = logging.getLogger("agentwatch.anomaly_detector")
 
-# ── Thresholds (tune these for demo sensitivity) ──────────────────────────
-LOOP_THRESHOLD = 5          # same tool called >= N times in one trace → loop
-TOKEN_SPIKE_THRESHOLD = 3000 # llm_total_tokens >= N → token spike
-LATENCY_DRIFT_MS = 3000     # duration_ms >= N → slow step
-ERROR_BURST_THRESHOLD = 3   # >= N errors in one trace → error burst
-TRUST_COLLAPSE_THRESHOLD = 0.3  # trust_score <= N → trust collapse
+# ── Default thresholds (overridable via update_thresholds()) ──────────────
+_DEFAULT_LOOP_THRESHOLD = 5
+_DEFAULT_TOKEN_SPIKE_THRESHOLD = 3000
+_DEFAULT_LATENCY_DRIFT_MS = 2000
+_DEFAULT_ERROR_BURST_THRESHOLD = 3
+_DEFAULT_TRUST_COLLAPSE_THRESHOLD = 0.3
 
 
 @dataclass
@@ -67,9 +70,18 @@ class AnomalyDetector:
 
     Key design: mirrors the same trust_score logic in langgraph_hooks.py
     so the detector and hooks stay in sync without duplication.
+
+    TASK 2: Thresholds are mutable at runtime via update_thresholds().
     """
 
     def __init__(self):
+        # Live thresholds — start at defaults, overridable via /api/config
+        self.loop_threshold: int = _DEFAULT_LOOP_THRESHOLD
+        self.token_spike_threshold: int = _DEFAULT_TOKEN_SPIKE_THRESHOLD
+        self.latency_drift_ms: float = _DEFAULT_LATENCY_DRIFT_MS
+        self.error_burst_threshold: int = _DEFAULT_ERROR_BURST_THRESHOLD
+        self.trust_collapse_threshold: float = _DEFAULT_TRUST_COLLAPSE_THRESHOLD
+
         # Per-trace, per-tool call counts  {trace_id: {tool_name: count}}
         self._tool_counts: Dict[str, Dict[str, int]] = defaultdict(lambda: defaultdict(int))
         # Per-trace error counts  {trace_id: count}
@@ -82,6 +94,40 @@ class AnomalyDetector:
         self.anomaly_log: List[dict] = []
 
     # ─────────────────────────────────────────────────────────────────────
+    # TASK 2: Live threshold update
+    # ─────────────────────────────────────────────────────────────────────
+
+    def update_thresholds(
+        self,
+        loop_threshold: Optional[int] = None,
+        token_spike_threshold: Optional[int] = None,
+        latency_drift_ms: Optional[float] = None,
+        error_burst_threshold: Optional[int] = None,
+        trust_score_critical: Optional[float] = None,
+    ):
+        """
+        Update detection thresholds at runtime.
+        Called by main.py when POST /api/config is received.
+        Only updates fields that are explicitly passed (not None).
+        """
+        if loop_threshold is not None:
+            self.loop_threshold = loop_threshold
+        if token_spike_threshold is not None:
+            self.token_spike_threshold = token_spike_threshold
+        if latency_drift_ms is not None:
+            self.latency_drift_ms = latency_drift_ms
+        if error_burst_threshold is not None:
+            self.error_burst_threshold = error_burst_threshold
+        if trust_score_critical is not None:
+            self.trust_collapse_threshold = trust_score_critical
+
+        logger.info(
+            f"[AnomalyDetector] Thresholds updated — "
+            f"loop={self.loop_threshold}, token={self.token_spike_threshold}, "
+            f"latency={self.latency_drift_ms}ms, trust<={self.trust_collapse_threshold}"
+        )
+
+    # ─────────────────────────────────────────────────────────────────────
     # Main entry — called for every incoming event
     # ─────────────────────────────────────────────────────────────────────
 
@@ -89,8 +135,6 @@ class AnomalyDetector:
         """
         Inspect one event dict (as emitted by AgentEvent.to_dict()).
         Returns AnomalyResult if an anomaly is detected, else None.
-
-        Called from main.py right after the agent WebSocket sends an event.
         """
         event_type = event.get("event_type", "")
         trace_id   = event.get("trace_id", "unknown")
@@ -119,7 +163,7 @@ class AnomalyDetector:
             result = self._check_error_burst(trace_id, step_name)
 
         # ── 5. Trust collapse — skip on error events (trust=0.0 is expected for errors)
-        if result is None and event_type != "error" and trust <= TRUST_COLLAPSE_THRESHOLD:
+        if result is None and event_type != "error" and trust <= self.trust_collapse_threshold:
             result = self._check_trust_collapse(trace_id, trust, step_name, tool_name)
 
         if result and result.detected:
@@ -141,22 +185,14 @@ class AnomalyDetector:
     # ─────────────────────────────────────────────────────────────────────
 
     def _check_loop(self, trace_id: str, tool_name: str, trust: float) -> Optional[AnomalyResult]:
-        """
-        Matches the logic in langgraph_hooks.py on_tool_call():
-            count_key = f"{trace_id}:{tool_name}"
-            is_anomaly = call_count >= 5
-        We track the same counter independently here for pre-filter detection.
-        """
         self._tool_counts[trace_id][tool_name] += 1
         count = self._tool_counts[trace_id][tool_name]
 
-        if count < LOOP_THRESHOLD:
+        if count < self.loop_threshold:
             return None
 
-        # Confidence increases with call count — more calls = more certain it's a loop
-        confidence = min(0.99, 0.70 + (count - LOOP_THRESHOLD) * 0.05)
-
-        severity = "critical" if count >= 10 else "high"
+        confidence = min(0.99, 0.70 + (count - self.loop_threshold) * 0.05)
+        severity = "critical" if count >= self.loop_threshold * 2 else "high"
         return AnomalyResult(
             detected=True,
             anomaly_type="loop",
@@ -166,16 +202,14 @@ class AnomalyDetector:
             call_count=count,
             trust_score=trust,
             confidence=confidence,
-            extra={"threshold": LOOP_THRESHOLD},
+            extra={"threshold": self.loop_threshold},
         )
 
     def _check_token_spike(self, trace_id: str, tokens: int, step_name: str) -> Optional[AnomalyResult]:
-        """Token count > TOKEN_SPIKE_THRESHOLD signals runaway generation."""
-        if tokens < TOKEN_SPIKE_THRESHOLD:
+        if tokens < self.token_spike_threshold:
             return None
 
-        # Severity scales with how far above threshold
-        ratio = tokens / TOKEN_SPIKE_THRESHOLD
+        ratio = tokens / self.token_spike_threshold
         severity = "critical" if ratio >= 3 else "high" if ratio >= 2 else "medium"
         confidence = min(0.95, 0.6 + ratio * 0.1)
 
@@ -183,33 +217,27 @@ class AnomalyDetector:
             detected=True,
             anomaly_type="token_spike",
             severity=severity,
-            message=f"Token spike at '{step_name}' — {tokens:,} tokens (threshold: {TOKEN_SPIKE_THRESHOLD:,})",
-            trust_score=max(0.1, 1.0 - (tokens / 10000)),  # mirrors hooks.py llm_call trust formula
+            message=f"Token spike at '{step_name}' — {tokens:,} tokens (threshold: {self.token_spike_threshold:,})",
+            trust_score=max(0.1, 1.0 - (tokens / 10000)),
             confidence=confidence,
-            extra={"tokens": tokens, "threshold": TOKEN_SPIKE_THRESHOLD},
+            extra={"tokens": tokens, "threshold": self.token_spike_threshold},
         )
 
     def _check_latency(self, trace_id: str, duration_ms: float, step_name: str) -> Optional[AnomalyResult]:
-        """
-        Detects latency drift: single step too slow, or trend getting worse.
-        Matches the 'drift' mode in demo_agent.py:
-            base_ms = int(base_ms * (1 + 0.3 * call_count))
-        """
         self._latency_history[trace_id].append(duration_ms)
 
-        if duration_ms < LATENCY_DRIFT_MS:
+        if duration_ms < self.latency_drift_ms:
             return None
 
         history = list(self._latency_history[trace_id])
-        # Check for trend: is latency increasing over time?
         if len(history) >= 3:
             trend = history[-1] > history[-2] > history[-3]
             drift_msg = "and trending upward" if trend else ""
         else:
             drift_msg = ""
 
-        severity = "high" if duration_ms > LATENCY_DRIFT_MS * 2 else "medium"
-        confidence = min(0.90, 0.65 + (duration_ms / LATENCY_DRIFT_MS) * 0.1)
+        severity = "high" if duration_ms > self.latency_drift_ms * 2 else "medium"
+        confidence = min(0.90, 0.65 + (duration_ms / self.latency_drift_ms) * 0.1)
 
         return AnomalyResult(
             detected=True,
@@ -218,18 +246,17 @@ class AnomalyDetector:
             message=f"Slow step '{step_name}' — {duration_ms:.0f}ms {drift_msg}",
             trust_score=max(0.2, 1.0 - duration_ms / 10000),
             confidence=confidence,
-            extra={"duration_ms": duration_ms, "threshold_ms": LATENCY_DRIFT_MS},
+            extra={"duration_ms": duration_ms, "threshold_ms": self.latency_drift_ms},
         )
 
     def _check_error_burst(self, trace_id: str, step_name: str) -> Optional[AnomalyResult]:
-        """Multiple errors in one trace = error burst."""
         self._error_counts[trace_id] += 1
         count = self._error_counts[trace_id]
 
-        if count < ERROR_BURST_THRESHOLD:
+        if count < self.error_burst_threshold:
             return None
 
-        severity = "critical" if count >= 5 else "high"
+        severity = "critical" if count >= self.error_burst_threshold * 2 else "high"
         confidence = min(0.95, 0.70 + count * 0.05)
 
         return AnomalyResult(
@@ -245,13 +272,8 @@ class AnomalyDetector:
     def _check_trust_collapse(
         self, trace_id: str, trust: float, step_name: str, tool_name: str
     ) -> Optional[AnomalyResult]:
-        """
-        Trust collapse: trust_score <= 0.3.
-        This is the TRUST_COLLAPSE_THRESHOLD check described in the README.
-        Only fires if no loop or token spike was already detected for this event.
-        """
         severity = "critical" if trust <= 0.1 else "high" if trust <= 0.2 else "medium"
-        confidence = min(0.90, 0.60 + (TRUST_COLLAPSE_THRESHOLD - trust) * 2)
+        confidence = min(0.90, 0.60 + (self.trust_collapse_threshold - trust) * 2)
 
         return AnomalyResult(
             detected=True,
@@ -261,7 +283,7 @@ class AnomalyDetector:
             tool_name=tool_name,
             trust_score=trust,
             confidence=confidence,
-            extra={"threshold": TRUST_COLLAPSE_THRESHOLD},
+            extra={"threshold": self.trust_collapse_threshold},
         )
 
     # ─────────────────────────────────────────────────────────────────────
@@ -269,41 +291,28 @@ class AnomalyDetector:
     # ─────────────────────────────────────────────────────────────────────
 
     def record_tool_call(self, tool_name: str, trace_id: str = "test") -> int:
-        """
-        Convenience method for unit tests — increment tool call count directly.
-        Returns the new count.
-        """
         self._tool_counts[trace_id][tool_name] += 1
         return self._tool_counts[trace_id][tool_name]
 
     def is_loop_detected(self, tool_name: str, trace_id: str = "test") -> bool:
-        """Used by unit tests to check loop detection."""
-        return self._tool_counts[trace_id][tool_name] >= LOOP_THRESHOLD
+        return self._tool_counts[trace_id][tool_name] >= self.loop_threshold
 
     def compute_trust_score(self, identifier: str, trace_id: str = "test") -> float:
-        """
-        Mirrors the trust formula in langgraph_hooks.py on_tool_call():
-            trust = max(0.05, 1.0 / (1 + 0.3 * max(0, call_count - 3)))
-        identifier = tool_name
-        """
         call_count = self._tool_counts[trace_id].get(identifier, 0)
         return max(0.05, 1.0 / (1 + 0.3 * max(0, call_count - 3)))
 
     def get_latest_anomaly(self, tool_name: str, trace_id: str = "test") -> Optional[dict]:
-        """Returns the latest anomaly dict for a trace, or None."""
         result = self._latest_anomaly.get(trace_id)
         if result:
             return result.as_dict
         return None
 
     def reset_trace(self, trace_id: str):
-        """Clear all state for a completed trace."""
         self._tool_counts.pop(trace_id, None)
         self._error_counts.pop(trace_id, None)
         self._latency_history.pop(trace_id, None)
 
     def get_stats(self) -> dict:
-        """Summary stats for /api/stats endpoint."""
         return {
             "total_anomalies_detected": len(self.anomaly_log),
             "active_traces": len(self._tool_counts),

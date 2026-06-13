@@ -1,6 +1,8 @@
 /**
- * agentwatch/frontend/src/alerts.js - IMPROVED
- * Better anomaly alerts with animations, more info, and working Splunk link
+ * agentwatch/frontend/src/alerts.js
+ * Anomaly alerts with Foundation-Sec reasoning panel.
+ * TASK 4: Export Incident Report button wired into both the anomaly card
+ *         and the reasoning panel.
  */
 
 const API_URL = window.__API_URL || 'http://localhost:8001';
@@ -9,19 +11,18 @@ const overlay = document.getElementById('anomaly-overlay');
 const reasoningPanel = document.getElementById('reasoning-panel');
 
 let activeAnomaly = null;
-let alertCount = 0;
+let lastReasoningText = '';  // TASK 4: stash reasoning for PDF export
 
 // ── Show Anomaly Alert ──────────────────────────────────────
 
 export function showAnomalyAlert(event) {
   activeAnomaly = event;
-  alertCount++;
   overlay.style.display = 'flex';
 
   const message = event.reasoning_content || `Anomaly detected at ${event.step_name}`;
   const tool = event.tool_name || event.step_name || 'unknown';
   const trust = Math.round((event.trust_score || 0) * 100);
-  const time = new Date().toLocaleTimeString();
+  const timeStr = new Date().toLocaleTimeString();
   const traceShort = (event.trace_id || '').substring(0, 12);
 
   const card = document.createElement('div');
@@ -31,11 +32,11 @@ export function showAnomalyAlert(event) {
       <span class="anomaly-icon">⚠️</span>
       <div style="flex:1">
         <div class="anomaly-title">Anomaly Detected</div>
-        <div style="font-size:9px;color:var(--text-dim);margin-top:2px;font-family:var(--mono)">${time} · trace:${traceShort}...</div>
+        <div style="font-size:9px;color:var(--text-dim);margin-top:2px;font-family:var(--mono)">${timeStr} · trace:${traceShort}...</div>
       </div>
       <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
-        <span style="font-size:9px;letter-spacing:1px;text-transform:uppercase;padding:2px 8px;border-radius:3px;background:rgba(255,51,85,0.2);color:var(--red);border:1px solid var(--red)">CRITICAL</span>
-        <button onclick="this.closest('.anomaly-card').remove(); checkOverlayEmpty()" 
+        <span style="font-size:9px;letter-spacing:1px;text-transform:uppercase;padding:2px 8px;border-radius:3px;background:rgba(255,51,85,0.2);color:var(--red);border:1px solid var(--red)">${(event.severity || 'CRITICAL').toUpperCase()}</span>
+        <button onclick="this.closest('.anomaly-card').remove(); checkOverlayEmpty()"
           style="background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:14px;padding:0">✕</button>
       </div>
     </div>
@@ -64,27 +65,29 @@ export function showAnomalyAlert(event) {
     </div>
 
     <div class="anomaly-actions">
-      <button class="btn btn-primary" onclick="explainAnomaly()">🔍 Explain This</button>
-      <button class="btn btn-secondary" onclick="openSplunk('${event.trace_id}', '${tool}')">📊 View in Splunk</button>
+      <button class="btn btn-primary" onclick="explainAnomaly()">🔍 Explain</button>
+      <button class="btn btn-secondary" onclick="openSplunk('${event.trace_id}', '${tool}')">📊 Splunk</button>
+      <button id="export-incident-btn" class="btn btn-secondary" onclick="window.exportIncidentReport(window._activeAnomaly, window._lastReasoning)">📄 Export PDF</button>
       <button class="btn btn-secondary" onclick="this.closest('.anomaly-card').remove(); checkOverlayEmpty()">Dismiss</button>
     </div>
   `;
 
-  // Remove old cards beyond 1 — keep only the latest anomaly visible
+  // Keep only 1 card at a time
   while (overlay.children.length >= 1) {
     overlay.removeChild(overlay.firstChild);
   }
   overlay.appendChild(card);
 
-  // Shake animation
-  card.style.animation = 'alert-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), shake 0.4s 0.3s ease';
+  // Stash on window so the export button can reach it
+  window._activeAnomaly = event;
+  window._lastReasoning = '';
 
   // Auto-dismiss after 45s
   setTimeout(() => {
     if (card.parentNode) {
       card.style.opacity = '0';
       card.style.transition = 'opacity 0.5s';
-      setTimeout(() => { if(card.parentNode) { card.remove(); checkOverlayEmpty(); }}, 500);
+      setTimeout(() => { if (card.parentNode) { card.remove(); checkOverlayEmpty(); } }, 500);
     }
   }, 45000);
 }
@@ -93,7 +96,7 @@ function checkOverlayEmpty() {
   if (overlay.children.length === 0) overlay.style.display = 'none';
 }
 
-// ── Explain This ─────────────────────────────────────────
+// ── Explain This (Foundation-Sec) ────────────────────────────────────────
 
 window.explainAnomaly = async function() {
   if (!activeAnomaly) return;
@@ -120,9 +123,15 @@ window.explainAnomaly = async function() {
       body: JSON.stringify({ anomaly_event: activeAnomaly, trace_id: activeAnomaly.trace_id }),
     });
     if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-    renderReasoning(await resp.json());
+    const result = await resp.json();
+    lastReasoningText = result.explanation + '\n\n' + result.recommended_action;
+    window._lastReasoning = lastReasoningText;
+    renderReasoning(result);
   } catch (e) {
-    renderReasoning(getRuleBasedExplanation(activeAnomaly));
+    const fallback = getRuleBasedExplanation(activeAnomaly);
+    lastReasoningText = fallback.explanation + '\n\n' + fallback.recommended_action;
+    window._lastReasoning = lastReasoningText;
+    renderReasoning(fallback);
   }
 };
 
@@ -136,7 +145,7 @@ function renderReasoning(result) {
       </div>
 
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
-        <span class="severity-badge ${severityClass}">${(result.severity||'high').toUpperCase()}</span>
+        <span class="severity-badge ${severityClass}">${(result.severity || 'high').toUpperCase()}</span>
         <span style="font-size:10px;color:var(--text-dim);font-family:var(--mono)">Foundation-Sec-1.1-8B</span>
       </div>
 
@@ -163,14 +172,15 @@ function renderReasoning(result) {
 
       <div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap">
         <button class="btn btn-primary" onclick="openSplunk('${activeAnomaly?.trace_id}', '')">View in Splunk</button>
-        <button class="btn btn-secondary" onclick="copyText('${encodeURIComponent(result.recommended_action||'')}')">Copy Fix</button>
+        <button class="btn btn-secondary" onclick="copyText('${encodeURIComponent(result.recommended_action || '')}')">Copy Fix</button>
+        <button class="btn btn-accent" onclick="window.exportIncidentReport(window._activeAnomaly, window._lastReasoning)">📄 Export PDF</button>
         <button class="btn btn-secondary" onclick="document.getElementById('reasoning-panel').style.display='none'">Close</button>
       </div>
     </div>
   `;
 }
 
-// ── Splunk deep link (FIXED) ──────────────────────────────
+// ── Splunk deep link ──────────────────────────────────────────────────────
 
 window.openSplunk = function(traceId, toolName) {
   let spl;
@@ -182,8 +192,7 @@ window.openSplunk = function(traceId, toolName) {
     spl = `index=agentwatch event_type=anomaly | sort -_time | table _time, agent_id, tool_name, reasoning_content, trust_score`;
   }
   const encoded = encodeURIComponent(`search ${spl}`);
-  const url = `${SPLUNK_URL}/en-US/app/search/search?q=${encoded}&earliest=-1h&latest=now`;
-  window.open(url, '_blank');
+  window.open(`${SPLUNK_URL}/en-US/app/search/search?q=${encoded}&earliest=-1h&latest=now`, '_blank');
 };
 
 window.copyText = function(encoded) {
@@ -193,6 +202,8 @@ window.copyText = function(encoded) {
 };
 
 window.checkOverlayEmpty = checkOverlayEmpty;
+
+// ── Rule-based fallback explanation ──────────────────────────────────────
 
 function getRuleBasedExplanation(event) {
   const msg = event.reasoning_content || '';
@@ -206,7 +217,7 @@ function getRuleBasedExplanation(event) {
     };
   }
   return {
-    explanation: `Anomalous behavior detected at step '${event.step_name}' with trust score ${Math.round((event.trust_score||0)*100)}%.`,
+    explanation: `Anomalous behavior detected at step '${event.step_name}' with trust score ${Math.round((event.trust_score || 0) * 100)}%.`,
     root_cause: 'Compound failure across multiple steps causing trust degradation.',
     recommended_action: `Review the full trace in Splunk and add error handling to nodes with trust_score < 0.5.`,
     severity: 'high',
