@@ -118,8 +118,8 @@ class AnomalyDetector:
         if result is None and event_type == "error":
             result = self._check_error_burst(trace_id, step_name)
 
-        # ── 5. Trust collapse (any event) ─────────────────────────────────
-        if result is None and trust <= TRUST_COLLAPSE_THRESHOLD:
+        # ── 5. Trust collapse — skip on error events (trust=0.0 is expected for errors)
+        if result is None and event_type != "error" and trust <= TRUST_COLLAPSE_THRESHOLD:
             result = self._check_trust_collapse(trace_id, trust, step_name, tool_name)
 
         if result and result.detected:
