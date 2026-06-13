@@ -6,6 +6,8 @@
   <img src="https://img.shields.io/badge/Splunk-AI%20Toolkit-FF4500?style=for-the-badge&logo=splunk" />
   <img src="https://img.shields.io/badge/Foundation--Sec-1.1--8B-00B4D8?style=for-the-badge" />
   <img src="https://img.shields.io/badge/LangGraph-0.2.28-green?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/CrewAI-supported-blue?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/OpenAI%20Agents-supported-412991?style=for-the-badge" />
   <img src="https://img.shields.io/badge/OpenTelemetry-1.27.0-blueviolet?style=for-the-badge" />
   <img src="https://img.shields.io/badge/Three.js-r128-black?style=for-the-badge" />
   <img src="https://img.shields.io/badge/Python-3.10-blue?style=for-the-badge&logo=python" />
@@ -18,14 +20,10 @@
 <p align="center">
   🌐 <a href="https://ashish-doing.github.io/agentwatch">Landing Page</a> &nbsp;•&nbsp;
   🚀 <a href="https://agentwatch-production-4a86.up.railway.app">Live Demo</a> &nbsp;•&nbsp;
-  ⚡ <a href="#quick-start">Quick Start</a> &nbsp;•&nbsp;
-  🏗️ <a href="#architecture">Architecture</a> &nbsp;•&nbsp;
-  📋 <a href="architecture_diagram.md">Full Diagram</a>
+  📊 <a href="https://agentwatch-production-4a86.up.railway.app/ops">Agent Ops Dashboard</a> &nbsp;•&nbsp;
+  🗺️ <a href="https://agentwatch-production-4a86.up.railway.app/topology">Topology Map</a> &nbsp;•&nbsp;
+  ⚡ <a href="#quick-start">Quick Start</a>
 </p>
-
----
-
-![AgentWatch Demo](docs/screenshots/demo.gif)
 
 ---
 
@@ -39,14 +37,10 @@ AI agents are entering production every day — and failing silently. When your 
 
 ## 🔥 The Problem
 
-The world is filling with AI agents that **fail silently**.
-
 - **34%** of production AI agents fail silently due to missing observability tooling
 - Loop failures cost enterprises **$2,400/hour** in wasted API calls
 - Mean time to detect an agent failure: **4.2 hours**
-- **Zero** enterprise-grade observability tools exist for LangGraph agents on Splunk
-
-When your agent gets stuck calling the same tool 23 times, nobody knows. When token counts spike to 8,000+, nobody notices. When latency drifts 300% over 2 hours, nobody catches it.
+- **Zero** enterprise-grade observability tools exist natively on Splunk
 
 **Until now.**
 
@@ -54,110 +48,83 @@ When your agent gets stuck calling the same tool 23 times, nobody knows. When to
 
 ## 💡 The Solution
 
-**AgentWatch** is a Splunk Platform app that wraps any LangGraph agent with OpenTelemetry, streams its behavior into Splunk in real time, detects anomalies automatically, explains them in plain English with Foundation-Sec-1.1-8B, and runs a full post-run **Agent Autopsy** graded A–F.
+**AgentWatch** is a Splunk Platform app that wraps any LangGraph, CrewAI, or OpenAI Agents SDK agent with OpenTelemetry, streams its behavior into Splunk in real time, detects anomalies automatically, explains them in plain English with Foundation-Sec-1.1-8B, and runs a full post-run **Agent Autopsy** graded A–F.
 
-**One click:** "Explain this anomaly" → plain English root cause + recommended fix + SPL query.  
+**One click:** "Explain this anomaly" → plain English root cause + recommended fix + SPL query.
+**One click:** "Export Incident Report" → PDF with full Foundation-Sec reasoning + SPL queries.
 **End of run:** "Run Autopsy" → performance grade, cost estimate, and fix recommendation.
 
 ---
 
 ## ⚔️ Why AgentWatch?
 
-| Capability | AgentWatch | LangSmith | Arize Phoenix | No Observability |
-|---|---|---|---|---|
-| **Splunk-native** | ✅ First & only | ❌ SaaS only | ❌ SaaS only | — |
-| **Real-time anomaly detection** | ✅ Native SPL `anomalydetection` + in-process pre-filter | ⚠️ Manual rules | ⚠️ Drift metrics only | ❌ |
-| **Plain-English root cause** | ✅ Foundation-Sec-1.1-8B | ❌ | ❌ | ❌ |
-| **Post-run Agent Autopsy** | ✅ Graded A–F with cost estimate | ❌ | ❌ | ❌ |
-| **NL → SPL query generation** | ✅ Splunk AI Assistant | ❌ | ❌ | ❌ |
-| **Loop detection** | ✅ Statistical (99.25% confidence) | ⚠️ Rule-based | ❌ | ❌ |
-| **Zero-config SDK** | ✅ `@watch` / `watch_graph` decorator | ⚠️ Manual | ⚠️ Manual | ❌ |
-| **Live demo (no setup)** | ✅ One-click Railway deploy | ❌ | ❌ | — |
-| **Works inside enterprise Splunk** | ✅ On-prem + Cloud | ❌ | ❌ | — |
-| **Open source** | ✅ MIT | ❌ Proprietary | ✅ | — |
-
-AgentWatch is the **only observability tool built natively on Splunk** — every agent event is instantly searchable with SPL, anomaly detection runs on real Splunk infrastructure, and security teams can audit agent behavior in the same platform they already use.
+| Capability | AgentWatch | LangSmith | Arize Phoenix |
+|---|---|---|---|
+| **Splunk-native** | ✅ First & only | ❌ SaaS only | ❌ SaaS only |
+| **Real-time anomaly detection** | ✅ SPL `anomalydetection` + in-process | ⚠️ Manual rules | ⚠️ Drift metrics only |
+| **Plain-English root cause** | ✅ Foundation-Sec-1.1-8B | ❌ | ❌ |
+| **Post-run Agent Autopsy** | ✅ Graded A–F + cost estimate | ❌ | ❌ |
+| **NL → SPL** | ✅ Splunk AI Assistant | ❌ | ❌ |
+| **Multi-framework** | ✅ LangGraph · CrewAI · OpenAI Agents · AutoGen | ⚠️ LangChain only | ⚠️ Manual |
+| **CRM Ops Dashboard** | ✅ /ops — full run history + SLOs | ❌ | ❌ |
+| **Multi-agent topology** | ✅ Three.js force-directed graph | ❌ | ❌ |
+| **Alert rules configurator** | ✅ Live threshold tuning via UI | ❌ | ❌ |
+| **Incident PDF export** | ✅ One-click Foundation-Sec PDF | ❌ | ❌ |
+| **Slack/PagerDuty webhook** | ✅ CRITICAL anomaly → Slack | ❌ | ❌ |
+| **Cost tracker** | ✅ Per-agent per-run USD estimate | ❌ | ❌ |
+| **SLO manager** | ✅ Uptime · trust · loop-free SLOs | ❌ | ❌ |
+| **Splunk Cloud app** | ✅ Native app packaging | ❌ | ❌ |
+| **Open source** | ✅ MIT | ❌ Proprietary | ✅ |
 
 ---
 
 ## 🏗️ Architecture
 
-![AgentWatch Architecture Diagram](architecture.png)
+![AgentWatch Architecture Diagram](architecture.svg)
 
 The full annotated diagram with data-flow details lives in [`architecture_diagram.md`](architecture_diagram.md).
 
 **How it flows:**
 
 ```
-YOUR LANGGRAPH AGENT
+YOUR AGENT (LangGraph · CrewAI · OpenAI Agents · AutoGen)
          │
          ▼
-[AgentWatch SDK — @watch / watch_graph]
- Zero-config wrapper:
- ├── @watch(agent_name="my_agent")      → decorate individual nodes
- ├── watch_graph(compiled, ...)         → instrument entire graph in one line
- └── AgentWatchContext(...)             → scoped trace per run
+[AgentWatch SDK / Framework Hooks]
+ ├── @watch(agent_name="my_agent")        → decorate individual nodes
+ ├── watch_graph(compiled, ...)           → instrument entire graph in one line
+ ├── AgentWatchCrewAI(agent_name=...)     → CrewAI callback handler
+ ├── AgentWatchOpenAI(agent_name=...)     → OpenAI Agents hook class
+ └── AgentWatchAutoGen(agent_name=...)    → AutoGen message hook
          │
          ▼
-[OpenTelemetry Instrumentation]
- Captures every:
- ├── LLM call         → model, tokens, latency, reasoning
- ├── Tool call        → name, input, output, duration
- ├── Reasoning step   → step_id, content, trust score
- └── Error/exception  → full context
+[OpenTelemetry] → LLM calls · tool calls · reasoning steps · trust scores
          │
-         ├─────────────────────────────────────────┐
-         ▼                                         ▼
-[FastAPI + WebSocket]                   [Three.js Live Brain Graph]
- Real-time event fan-out                Force-directed visualization:
- 500-event ring buffer                  ├── Nodes  = reasoning steps
-                                        ├── Edges  = execution flow
-         │                              ├── Color  = trust score (green → red)
-         ▼                              ├── Size   = token count
-[AnomalyDetector — in-process]          └── Pulse  = anomaly detected
- Pre-filter before Splunk:
- ├── Tool call frequency  → loop detection
- ├── Token count spikes   → runaway generation
- ├── Latency patterns     → drift detection
- ├── Error rate trends    → burst detection
- └── Trust collapse       → composite score < 0.3
+         ├──────────────────────────────────────┐
+         ▼                                      ▼
+[FastAPI + WebSocket]               [Three.js Live Brain /]
+ 500-event ring buffer               force-directed graph
+ 100-event replay on connect         anomaly glow · trust colors
          │
          ▼
-[Splunk HEC]
- index: agentwatch
- sourcetype: agentwatch:otel
+[AnomalyDetector — in-process pre-filter]
+ loop ≥5 · token spike ≥3k · latency ≥3s · error burst ≥3 · trust ≤0.3
+ → all thresholds configurable via /api/config + UI
+ → CRITICAL anomalies → Slack webhook notification
          │
          ▼
-[Splunk MCP Server] ◄─── All events instantly searchable via SPL
+[Splunk HEC] → index=agentwatch · sourcetype=agentwatch:otel
+         │
+         ├── [Splunk AI Toolkit] — anomalydetection (99.25% confidence)
+         ├── [Splunk MCP Server] — all telemetry searchable via SPL
+         ├── [Splunk AI Assistant] — "show loops last hour" → valid SPL
+         └── [Foundation-Sec-1.1-8B] — Explain This · Autopsy A–F · PDF export
          │
          ▼
-[Splunk AI Toolkit — anomalydetection]
- Statistical time-series analysis:
- ├── Tool call frequency → loop detection
- ├── Token count spikes  → runaway generation
- ├── Latency patterns    → drift detection
- └── Error rate trends   → silent failure
-         │
-         ▼
-[Foundation-Sec-1.1-8B] ◄─── Splunk hosted model
- "Explain This" button:
-   Input:  anomaly context + last 10 agent events
-   Output: what happened · root cause · recommended fix · severity
-
- "Run Autopsy" (POST /api/autopsy):
-   Input:  full trace
-   Output: performance grade A–F · cost estimate · fix recommendation
-         │
-         ▼
-[Splunk AI Assistant] ◄─── NL → SPL
- "Show me all loops in the last hour"
-  → generates SPL → queries Splunk → returns results
-         │
-         ▼
-[Dashboard Alert Overlay]
- ⚠️  "Loop detected — search_tool called 23x in 4s"
- 📋  "Fix: add empty-result guard at step 3"
- 🔍  "View in Splunk" → deep link to full trace
+[Three pages of UI]
+ /           — Live Brain (Three.js force-directed visualization)
+ /ops        — Agent Operations CRM Dashboard
+ /topology   — Multi-agent topology map (second Three.js graph)
 ```
 
 ---
@@ -165,19 +132,18 @@ YOUR LANGGRAPH AGENT
 ## 📸 Screenshots
 
 ### 🧠 Live Brain Visualization — Loop Anomaly Detected
-![AgentWatch brain visualization showing live anomaly detection with Foundation-Sec explanation](docs/screenshots/screenshot-hero.png)
-*510 events · 42 anomalies · Loop detected — search_tool called 23x · Foundation-Sec root cause + fix recommendation*
+![AgentWatch brain visualization showing live anomaly detection](docs/screenshots/screenshot-hero.png)
 
 ### 📊 Splunk Dashboard — Real Telemetry Data
-![AgentWatch Splunk dashboard showing 1269 events, 180 anomalies, 59.7% trust score](docs/screenshots/screenshot-dashboard-top.png)
-*1,269 events · 180 anomalies · 59.7% avg trust score · 159,970 tokens — all real data*
+![AgentWatch Splunk dashboard showing 1269 events](docs/screenshots/screenshot-dashboard-top.png)
 
-![AgentWatch Splunk dashboard bottom panels showing anomaly table and full event log](docs/screenshots/screenshot-dashboard-bottom.png)
-*Loop detection chart, anomaly table, trust heatmap, latency drift, full event log*
+### 🗂️ Agent Operations CRM Dashboard
+*Run history · trust trend chart · anomaly breakdown · SLO status · cost tracker*
+Live at: https://agentwatch-production-4a86.up.railway.app/ops
 
-### 🔍 Splunk Anomaly Detection — Statistical Analysis
-![AgentWatch Splunk anomaly detection report showing 139 tool call spike](docs/screenshots/screenshot-anomaly-detection.png)
-*Native Splunk anomalydetection caught a 139-tool-call spike with 99.25% confidence*
+### 🗺️ Multi-Agent Topology Map
+*Force-directed Three.js graph · agent hubs · data flow particles · orbit camera*
+Live at: https://agentwatch-production-4a86.up.railway.app/topology
 
 ---
 
@@ -185,20 +151,21 @@ YOUR LANGGRAPH AGENT
 
 | Component | Technology | Purpose |
 |-----------|-----------|---------|
-| Agent Framework | LangGraph 0.2.28 | The agent being monitored |
+| Agent Framework | LangGraph 0.2.28 | Primary demo agent |
+| Framework Hooks | CrewAI · OpenAI Agents · AutoGen | Multi-framework support |
 | Observability | OpenTelemetry SDK 1.27.0 | Capture every LLM/tool call |
-| SDK | `agentwatch_sdk.py` | Zero-config `@watch` / `watch_graph` decorator |
+| SDK | `agentwatch_sdk.py` + `agentwatch_hooks.py` | Zero-config instrumentation |
 | Event Transport | Splunk HEC (port 8088) | Real-time telemetry delivery |
-| Event Indexing | Splunk MCP Server | All telemetry searchable via SPL |
-| Anomaly Detection (in-process) | `AnomalyDetector` | Pre-filter: loop, spike, drift, error burst, trust collapse |
-| Anomaly Detection (Splunk) | Splunk AI Toolkit — `anomalydetection` | Statistical time-series scoring |
-| Reasoning Engine | Foundation-Sec-1.1-8B | Plain English anomaly explanation + Agent Autopsy |
+| Anomaly Detection | `AnomalyDetector` + Splunk AI Toolkit | In-process + statistical |
+| Reasoning Engine | Foundation-Sec-1.1-8B | Explain This · Autopsy · PDF |
 | NL Queries | Splunk AI Assistant | Natural language → SPL |
-| Backend API | FastAPI + WebSocket | Real-time event streaming + demo trigger |
-| 3D Visualization | Three.js r128 | Live brain graph |
-| Frontend Modules | Health score, sparklines, trace timeline, autopsy panel | Dashboard UI |
-| Deployment | Railway | One-click live demo (no Splunk needed) |
-| Frontend Hosting | GitHub Pages | Landing page |
+| Notifications | Slack webhook | CRITICAL anomaly alerts |
+| Backend API | FastAPI + WebSocket | Event streaming + all endpoints |
+| 3D Visualization | Three.js r128 | Brain graph + topology map |
+| Ops Dashboard | Chart.js 4.4 | Trust trend · anomaly doughnut |
+| PDF Export | reportlab | Incident report generation |
+| Splunk App | Native packaging | splunk_app/ — Splunkbase ready |
+| Deployment | Railway | Live demo (no Splunk needed) |
 
 ---
 
@@ -206,112 +173,148 @@ YOUR LANGGRAPH AGENT
 
 | Capability | How AgentWatch Uses It |
 |-----------|-------|
-| **Splunk MCP Server** | All agent telemetry indexed; SPL queries run directly from the UI panel |
-| **Splunk AI Toolkit** | `anomalydetection` command on tool-call time-series — caught 180 anomalies with statistical scoring |
-| **Foundation-Sec-1.1-8B** | Powers "Explain This" (per-anomaly) and "Run Autopsy" (full-trace graded report) |
-| **Splunk AI Assistant** | Natural language to SPL; type "show me all loops in the last hour" and get live results |
+| **Splunk MCP Server** | All agent telemetry indexed; SPL queries run from UI panel |
+| **Splunk AI Toolkit** | `anomalydetection` on tool-call time-series — 99.25% confidence, 180 anomalies |
+| **Foundation-Sec-1.1-8B** | "Explain This" per-anomaly + "Run Autopsy" full-trace graded report + PDF export |
+| **Splunk AI Assistant** | NL → SPL; type "show me all loops in the last hour" → live results |
 
 ---
 
 ## 📊 What AgentWatch Detects
 
-| Failure Mode | Detection Method | Alert Level |
-|-------------|-----------------|-------------|
-| Infinite loops | Tool call frequency — in-process + Splunk `anomalydetection` | ⚠️ CRITICAL |
-| Token spikes | LLM token count outlier (threshold: 3,000) | ⚠️ HIGH |
-| Latency drift | Step duration trend — monotonic increase detection | ⚠️ MEDIUM |
-| Error burst | ≥ 3 errors in one trace | ⚠️ HIGH |
-| Trust collapse | Composite score ≤ 0.3 | ⚠️ CRITICAL |
+| Failure Mode | Detection | Alert | Configurable |
+|-------------|-----------|-------|-------------|
+| Infinite loops | Tool call frequency ≥5 | ⚠️ CRITICAL | ✅ UI slider |
+| Token spikes | LLM tokens ≥3,000 | ⚠️ HIGH | ✅ UI slider |
+| Latency drift | Step duration ≥3,000ms | ⚠️ MEDIUM | ✅ UI slider |
+| Error burst | ≥3 errors in one trace | ⚠️ HIGH | ✅ UI slider |
+| Trust collapse | Trust score ≤0.3 | ⚠️ CRITICAL | ✅ UI slider |
+
+All thresholds are configurable live via the **⚙ Config** panel in the UI (no SPL edit needed).
 
 ---
 
-## 🔭 AgentWatch SDK
+## 🔭 Framework Support
 
-Zero-config instrumentation for any LangGraph agent or Python function.
+AgentWatch works with any Python AI agent framework via `agentwatch_hooks.py`:
 
-### Installation
-
-No new packages needed — `websockets` and `httpx` are already in `requirements.txt`.
-
-```bash
-# Copy agentwatch_sdk.py into your backend/ folder, then:
-from agentwatch_sdk import watch, watch_graph, emit_event
-```
-
-### Usage
-
-**Option A — Decorate individual nodes (recommended)**
-
+**LangGraph** (full native support):
 ```python
-from agentwatch_sdk import watch
-
-@watch(agent_name="my_agent")            # zero required config beyond this
-def research_node(state):
-    ...
-    return state
-
-@watch(agent_name="my_agent")
-def analysis_node(state):
-    ...
-    return state
+from agentwatch_sdk import watch, watch_graph
+compiled = watch_graph(graph.compile(), agent_name="my_agent")
 ```
 
-**Option B — Instrument an entire compiled graph in one line**
-
+**CrewAI**:
 ```python
-from agentwatch_sdk import watch_graph
-
-compiled = graph.compile()
-compiled = watch_graph(compiled, agent_name="my_agent")   # wraps every node
-result   = compiled.invoke(initial_state)
+from agentwatch_hooks import AgentWatchCrewAI
+aw = AgentWatchCrewAI(agent_name="my_crew")
+agent = Agent(role="Researcher", ..., callbacks=[aw])
 ```
 
-**Option C — Emit tool_call / llm_call events from inside a node**
-
+**OpenAI Agents SDK**:
 ```python
-from agentwatch_sdk import emit_event
-
-emit_event(
-    "tool_call", "research", agent_name="my_agent",
-    tool_name="search_tool",
-    tool_input="AI observability 2026",
-    tool_output="Market at $28.5B...",
-    duration_ms=180.0,
-    trust_score=0.92,
-)
+from agentwatch_hooks import AgentWatchOpenAI
+hooks = AgentWatchOpenAI(agent_name="my_agent")
+agent = Agent(name="Assistant", instructions="...", hooks=hooks)
 ```
 
-**Option D — Context manager for scoped per-run traces**
-
+**AutoGen**:
 ```python
-from agentwatch_sdk import watch_graph, AgentWatchContext
-
-with AgentWatchContext(agent_name="my_agent") as ctx:
-    result = compiled.invoke(state)
-# ctx.trace_id → the UUID used for this run (log it!)
+from agentwatch_hooks import AgentWatchAutoGen
+hook = AgentWatchAutoGen(agent_name="autogen_crew")
+assistant.register_reply(trigger=autogen.ConversableAgent, reply_func=hook.on_message)
 ```
 
-### Configuration
+**Any framework** (generic decorators):
+```python
+from agentwatch_hooks import watch_tool, watch_llm
 
-| Parameter | Default | Description |
-|-----------|---------|-------------|
-| `agent_name` | *(required)* | Appears as `agent_id` in the dashboard |
-| `ws_url` | `ws://localhost:8001/ws/agent-stream` | AgentWatch backend WebSocket |
-| `http_url` | `http://localhost:8001/api/events/ingest` | HTTP fallback |
-| `trace_id` | auto-generated UUID | Pin multiple nodes to the same trace |
-| `step_name` | function `__name__` | Override the step name in events |
+@watch_tool(agent_name="my_agent", tool_name="search")
+def search_tool(query: str) -> str: ...
 
-> **Graceful degradation:** if the backend is unreachable, events are silently dropped and your agent runs unaffected.
+@watch_llm(agent_name="my_agent")
+def call_llm(prompt: str) -> dict: ...
+```
+
+---
+
+## 🗂️ Agent Operations Dashboard (/ops)
+
+A CRM-style dashboard for managing a fleet of agents:
+
+- **KPI row** — total runs, avg trust score, total anomalies, token usage, estimated cost, live events
+- **Agent run history table** — sortable by trust, anomalies, cost, duration; filter by mode
+- **Trust trend chart** — 30-run line chart showing trust over time
+- **Anomaly breakdown** — doughnut chart by type (loop / token spike / latency drift / error burst / trust collapse)
+- **SLO status** — uptime · loop-free rate · cost · run time · trust SLOs with burn indicators
+- **Cost tracker** — per-run USD estimate at $0.15/1M tokens
+- **Live activity feed** — real-time WebSocket event stream
+
+---
+
+## 🗺️ Multi-Agent Topology Map (/topology)
+
+A second Three.js visualization showing agent-to-agent data flows:
+
+- **Agent hub nodes** — octahedral nodes, one per agent ID
+- **Step nodes** — colored by type (LLM call = blue, tool call = cyan, anomaly = red with glow ring)
+- **Edge particles** — animated data flow along connections
+- **Force-directed layout** — automatic positioning with repulsion + attraction physics
+- **Orbit camera** — drag to rotate, scroll to zoom
+- **Node inspector** — click any node → type, trust, agent, connection count
+
+---
+
+## 📄 Incident Report PDF Export
+
+One-click PDF export from the alert overlay or Agent Ops dashboard:
+
+- Incident summary table (trace ID, agent, timestamp, anomaly type, severity, trust score)
+- Full Foundation-Sec reasoning (what happened, root cause, recommended fix)
+- Relevant SPL queries to reproduce the incident
+- AgentWatch branding + generation timestamp
+
+---
+
+## 🔔 Slack Notifications
+
+Set `SLACK_WEBHOOK_URL` in `.env` to receive CRITICAL anomaly alerts:
+
+```
+🚨 AgentWatch CRITICAL: loop detected on agent demo-001
+— search_tool called 23x in 4s — View trace: [Splunk deep link]
+```
+
+Gracefully skips if the env var is not set.
+
+---
+
+## 📦 Splunk Cloud App
+
+`splunk_app/agentwatch/` contains a complete Splunk app package:
+
+```
+splunk_app/agentwatch/
+├── default/
+│   ├── app.conf           # App metadata
+│   ├── indexes.conf       # agentwatch index definition
+│   ├── inputs.conf        # HEC input + log monitor
+│   ├── props.conf         # agentwatch:otel sourcetype config
+│   ├── transforms.conf    # Field extractions (trust_score, agent_id, etc.)
+│   └── savedsearches.conf # 7 pre-built searches + CRON alert for CRITICAL anomalies
+└── metadata/
+    └── default.meta
+```
+
+Install by uploading `splunk_app/` to Splunk Cloud or dropping into `$SPLUNK_HOME/etc/apps/`.
 
 ---
 
 ## ⚡ Quick Start
 
 ### Prerequisites
-- Splunk Enterprise (dev license) with HEC enabled
-- [Splunk AI Toolkit](https://splunkbase.splunk.com/app/2890) installed
-- [Splunk MCP Server](https://splunkbase.splunk.com/app/7931) installed
 - Python 3.10+
+- Splunk Enterprise with HEC enabled (or use Railway live demo — no Splunk needed)
 
 ### 1. Clone & Configure
 
@@ -319,89 +322,96 @@ with AgentWatchContext(agent_name="my_agent") as ctx:
 git clone https://github.com/ashish-doing/agentwatch.git
 cd agentwatch
 cp .env.example .env
-# Edit .env with your Splunk HEC token and credentials
+# Edit .env with your Splunk HEC token
+# Optional: add SLACK_WEBHOOK_URL for CRITICAL anomaly notifications
 ```
 
-### 2. Splunk Setup
-
-```
-In Splunk:
-  Settings → Data Inputs → HTTP Event Collector → New Token
-  Name:        agentwatch-hec
-  Source type: agentwatch:otel
-  Index:       agentwatch  (create this index first)
-  Copy token → .env → SPLUNK_HEC_TOKEN
-```
-
-### 3. Install & Run Backend
+### 2. Install & Run
 
 ```bash
 pip install -r backend/requirements.txt
 uvicorn backend.api.main:app --host 0.0.0.0 --port 8001 --reload
 ```
 
-The backend also serves the frontend as static files — open `http://localhost:8001` and everything is available without a separate server.
+Open `http://localhost:8001` — all three pages available at `/`, `/ops`, `/topology`.
 
-### 4. Run the Demo Agent
+### 3. Run the Demo Agent
 
 ```bash
-# Healthy agent — trust scores 85-100%
-python backend/agent/agent_runner.py --mode normal
-
-# Loop mode — search_tool called 23x, anomaly fires
-python backend/agent/agent_runner.py --mode loop
-
-# Hallucination — token spike to 8000+
-python backend/agent/agent_runner.py --mode hallucinate
-
-# Drift — each step 30% slower
-python backend/agent/agent_runner.py --mode drift
+python backend/agent/agent_runner.py --mode normal      # healthy run
+python backend/agent/agent_runner.py --mode loop        # loop anomaly
+python backend/agent/agent_runner.py --mode hallucinate # token spike
+python backend/agent/agent_runner.py --mode drift       # latency drift
 ```
 
-Or trigger a demo run from the UI (no terminal needed):
+Or trigger from the UI buttons (no terminal needed).
+
+### 4. Try the API
 
 ```bash
+# Trigger a loop demo
 curl -X POST https://agentwatch-production-4a86.up.railway.app/api/demo/trigger \
-  -H "Content-Type: application/json" \
-  -d '{"mode": "loop"}'
-```
+  -H "Content-Type: application/json" -d '{"mode": "loop"}'
 
-### 5. Run Autopsy After a Run
-
-```bash
+# Run autopsy on last 200 events
 curl -X POST https://agentwatch-production-4a86.up.railway.app/api/autopsy \
-  -H "Content-Type: application/json" \
-  -d '{"last_n_events": 200}'
+  -H "Content-Type: application/json" -d '{"last_n_events": 200}'
+
+# Get run history for trend chart
+curl https://agentwatch-production-4a86.up.railway.app/api/history
+
+# Get/update alert thresholds
+curl https://agentwatch-production-4a86.up.railway.app/api/config
+curl -X POST https://agentwatch-production-4a86.up.railway.app/api/config \
+  -H "Content-Type: application/json" -d '{"loop_threshold": 3}'
 ```
 
-Returns: performance grade A–F, root cause, fix recommendation, estimated cost in USD.
+---
+
+## 📡 API Reference
+
+| Method | Endpoint | Purpose |
+|--------|----------|---------|
+| `WS` | `/ws/agent-stream` | Agent → backend event stream |
+| `WS` | `/ws/browser` | Backend → browser live events |
+| `POST` | `/api/explain` | Anomaly explanation via Foundation-Sec |
+| `POST` | `/api/query` | NL → SPL via AI Assistant |
+| `POST` | `/api/autopsy` | Post-run trace analysis, grade A–F |
+| `POST` | `/api/demo/trigger` | Trigger demo run (normal/loop/hallucinate/drift) |
+| `GET` | `/api/demo/status` | Check if demo is running |
+| `GET` | `/api/events` | Recent events from ring buffer |
+| `GET` | `/api/stats` | Live stats (events, anomalies, trust, connections) |
+| `GET` | `/api/history` | Last 30 run summaries for trust trend chart |
+| `GET` | `/api/config` | Current alert thresholds |
+| `POST` | `/api/config` | Update alert thresholds live |
+| `POST` | `/api/export/incident` | Generate PDF incident report |
+| `GET` | `/api/health` | Backend health + Splunk connectivity |
+| `GET` | `/` | Live Brain visualization |
+| `GET` | `/ops` | Agent Operations CRM Dashboard |
+| `GET` | `/topology` | Multi-agent topology map |
 
 ---
 
 ## 🔍 Useful SPL Queries
 
 ```spl
--- Find all loop anomalies
-index=agentwatch event_type=tool_call earliest=-30d
-| stats count as call_count by agent_id, tool_name, trace_id
-| where call_count > 5
-| sort -call_count
+-- All anomalies
+index=agentwatch event_type=anomaly | sort -_time
+| table _time, agent_id, anomaly_type, severity, trust_score, reasoning_content
 
--- Token spike detection
-index=agentwatch event_type=llm_call earliest=-30d
-| stats max(llm_total_tokens) as max_tokens by step_name, trace_id
-| where max_tokens > 3000
-| sort -max_tokens
+-- Loop detection
+index=agentwatch event_type=tool_call
+| stats count as calls by trace_id, tool_name | where calls >= 5 | sort -calls
 
--- Trust score heatmap by tool
-index=agentwatch earliest=-30d
-| stats avg(trust_score) as avg_trust by tool_name
-| sort avg_trust
+-- Trust trend over time
+index=agentwatch trust_score=* | timechart span=5m avg(trust_score) by agent_id
 
--- Native anomaly detection on tool call frequency
-index=agentwatch event_type=tool_call earliest=-30d
-| timechart span=1h count as tool_calls
-| fillnull value=0
+-- Token spikes
+index=agentwatch event_type=llm_call llm_total_tokens>=3000
+| table _time, agent_id, trace_id, llm_total_tokens, step_name
+
+-- Native Splunk anomaly detection
+index=agentwatch event_type=tool_call | timechart span=1h count as tool_calls
 | anomalydetection tool_calls
 ```
 
@@ -414,83 +424,81 @@ agentwatch/
 ├── backend/
 │   ├── agent/
 │   │   ├── demo_agent.py          # LangGraph demo agent (4 failure modes)
-│   │   ├── agent_runner.py        # CLI runner with direct HEC sending
-│   │   └── demo_runner_lib.py     # In-process demo trigger (used by /api/demo/trigger)
+│   │   ├── agent_runner.py        # CLI runner
+│   │   └── demo_runner_lib.py     # In-process demo trigger
 │   ├── instrumentation/
-│   │   ├── otel_setup.py          # OpenTelemetry + Splunk HEC exporter
-│   │   ├── langgraph_hooks.py     # LangGraph node instrumentation hooks
-│   │   └── anomaly_detector.py    # In-process pre-filter anomaly detector
+│   │   ├── otel_setup.py          # OpenTelemetry + HEC exporter
+│   │   ├── langgraph_hooks.py     # LangGraph node hooks
+│   │   └── anomaly_detector.py    # In-process pre-filter (5 anomaly types)
 │   ├── api/
-│   │   ├── main.py                # FastAPI + WebSocket + demo trigger + static serving
+│   │   ├── main.py                # FastAPI + WebSocket + all endpoints
 │   │   ├── splunk_client.py       # Splunk REST + MCP + AI Assistant
 │   │   ├── foundation_sec.py      # Foundation-Sec-1.1-8B client
 │   │   └── autopsy.py             # Post-run Agent Autopsy (grade A–F)
 │   ├── agentwatch_sdk.py          # Zero-config @watch / watch_graph SDK
+│   ├── agentwatch_hooks.py        # CrewAI / OpenAI Agents / AutoGen hooks
 │   └── requirements.txt
 ├── frontend/
-│   ├── index.html                 # Main app shell
+│   ├── index.html                 # Live Brain (main app)
+│   ├── ops.html                   # Agent Operations CRM Dashboard
+│   ├── topology.html              # Multi-agent topology map
 │   └── src/
 │       ├── brain.js               # Three.js force-directed brain graph
-│       ├── websocket.js           # Real-time WebSocket + demo simulation
-│       ├── alerts.js              # Anomaly alert overlays
+│       ├── websocket.js           # WebSocket + demo simulation
+│       ├── alerts.js              # Anomaly alert overlays + PDF export
 │       ├── assistant.js           # Splunk AI Assistant panel
-│       ├── health_score.js        # Live health score tracker
-│       ├── sparklines.js          # Mini trust/token sparkline charts
+│       ├── health_score.js        # Live health score
+│       ├── sparklines.js          # Mini sparkline charts
 │       ├── trace_timeline.js      # Trace step timeline
-│       └── autopsy_panel.js       # Post-run autopsy results panel
+│       └── autopsy_panel.js       # Post-run autopsy results
 ├── splunk/
-│   ├── dashboards/
-│   │   └── agentwatch.xml         # Splunk dashboard (8 panels, 30d range)
-│   └── searches/
-│       └── anomaly_searches.spl   # Saved SPL queries
+│   ├── dashboards/agentwatch.xml  # 8-panel Splunk dashboard
+│   └── searches/anomaly_searches.spl
+├── splunk_app/
+│   └── agentwatch/                # Splunk Cloud native app
+│       ├── default/               # app · indexes · inputs · props · transforms · savedsearches
+│       └── metadata/
 ├── docs/
-│   ├── screenshots/               # README screenshots
+│   ├── screenshots/
 │   └── index.html                 # Landing page (GitHub Pages)
-├── docker/
-│   ├── Dockerfile.backend
-│   └── docker-compose.yml
-├── architecture.png               # System architecture diagram
-├── architecture_diagram.md        # Architecture with annotated data flows
+├── architecture.svg               # System architecture diagram
+├── architecture_diagram.md        # Annotated architecture with data flows
 ├── .env.example
-├── LICENSE                        # MIT
+├── LICENSE
 └── README.md
 ```
 
 ---
 
-## 🗺️ Roadmap
+## 📊 Key Stats (Real Data)
 
-Future directions for AgentWatch — not commitments, but where AI agent observability on Splunk needs to go:
-
-| Area | Feature |
-|---|---|
-| **Alerting** | Alert rules configurator UI — set loop/trust/token thresholds without editing SPL |
-| **Reporting** | Incident report PDF export — share post-mortems in one click |
-| **Trust** | 30-run trust score trend chart — see stability over time |
-| **Integrations** | Slack & PagerDuty webhooks — route anomaly alerts to existing on-call workflows |
-| **Frameworks** | CrewAI + OpenAI Agents SDK support — not just LangGraph |
-| **Topology** | Multi-agent topology map — visualize agent-to-agent calls and handoffs |
-| **Operations** | CRM-style Agent Ops Dashboard — manage a fleet of agents like a product |
-| **Cost** | Token cost tracker — attribution per agent, per tool, per run |
-| **SLOs** | SLO manager — define and track uptime/trust SLOs for production agents |
-| **Packaging** | Splunk Cloud native packaging — one-click install from Splunkbase |
+| Metric | Value |
+|--------|-------|
+| Events indexed | 1,269+ |
+| Anomalies detected | 180 |
+| Avg trust score | 59.7% |
+| Tokens processed | 159,970 |
+| Loop confidence (Splunk) | 99.25% |
+| Frameworks supported | 5 (LangGraph · CrewAI · OpenAI Agents · AutoGen · generic) |
+| Frontend pages | 3 (Brain · Ops · Topology) |
+| API endpoints | 14 |
+| Splunk AI capabilities | 4 (MCP · AI Toolkit · Foundation-Sec · AI Assistant) |
 
 ---
 
 ## 🌐 Links
 
 - **Live Demo:** https://agentwatch-production-4a86.up.railway.app
+- **Agent Ops:** https://agentwatch-production-4a86.up.railway.app/ops
+- **Topology:** https://agentwatch-production-4a86.up.railway.app/topology
 - **Landing Page:** https://ashish-doing.github.io/agentwatch
 - **GitHub:** https://github.com/ashish-doing/agentwatch
-- **Splunk AI Toolkit:** https://splunkbase.splunk.com/app/2890
-- **Splunk MCP Server:** https://splunkbase.splunk.com/app/7931
 
 ---
 
 ## 👤 Author
 
-**Ashish Kumar**  
-B.Tech ECE, IIIT Guwahati (Batch 2024)
+**Ashish Kumar** — B.Tech ECE, IIIT Guwahati (Batch 2024)
 
 - GitHub: [@ashish-doing](https://github.com/ashish-doing)
 - LinkedIn: [linkedin.com/in/ashish-kumar-014aaa3b9](https://linkedin.com/in/ashish-kumar-014aaa3b9)
