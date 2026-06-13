@@ -16,6 +16,7 @@ from pydantic import BaseModel
 
 from .splunk_client import SplunkClient
 from .foundation_sec import FoundationSecClient
+from ..instrumentation.anomaly_detector import AnomalyDetector
 
 logger = logging.getLogger("agentwatch.api")
 
@@ -35,7 +36,7 @@ agent_connections: Set[WebSocket] = set()
 
 splunk = SplunkClient()
 foundation_sec = FoundationSecClient()
-
+anomaly_detector = AnomalyDetector()
 
 async def broadcast_to_browsers(event: dict):
     message = json.dumps({"type": "event", "data": event})
@@ -59,6 +60,21 @@ async def agent_stream(ws: WebSocket):
             raw = await ws.receive_text()
             event = json.loads(raw)
             event_buffer.append(event)
+
+            anomaly = anomaly_detector.check_event(event)
+            if anomaly:
+                anomaly_event = {
+                    **event,
+                    "event_type": "anomaly",
+                    "anomaly_type": anomaly.anomaly_type,
+                    "severity": anomaly.severity,
+                    "reasoning_content": anomaly.message,
+                    "trust_score": anomaly.trust_score,
+                    "confidence": anomaly.confidence,
+                }
+                event_buffer.append(anomaly_event)
+                await broadcast_to_browsers(anomaly_event)
+
             await broadcast_to_browsers(event)
             asyncio.create_task(splunk.index_event(event))
     except WebSocketDisconnect:
@@ -161,12 +177,15 @@ async def get_stats():
     agents = set(e.get("agent_id") for e in events if e.get("agent_id"))
     trust_scores = [e.get("trust_score", 1.0) for e in events if e.get("trust_score") is not None]
     avg_trust = sum(trust_scores) / len(trust_scores) if trust_scores else 1.0
+    detector_stats = anomaly_detector.get_stats()
     return {
         "total_events": len(events),
         "anomalies": len(anomalies),
         "agents": len(agents),
         "avg_trust": round(avg_trust, 3),
         "browser_connections": len(browser_connections),
+        "detector_anomalies": detector_stats["total_anomalies_detected"],
+        "anomaly_breakdown": detector_stats["anomaly_breakdown"],
     }
 
 
