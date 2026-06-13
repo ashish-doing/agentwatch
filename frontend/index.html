@@ -520,6 +520,71 @@
       margin-top: 6px;
     }
 
+    /* ── Live Demo Controls ── */
+    #demo-controls {
+      position: fixed;
+      bottom: 16px;
+      right: 16px;
+      z-index: 60;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 8px;
+      pointer-events: all;
+    }
+
+    #demo-controls .demo-label {
+      font-size: 9px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+
+    #demo-buttons {
+      display: flex;
+      gap: 6px;
+    }
+
+    .demo-btn {
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      color: var(--text);
+      transition: all 0.15s;
+    }
+
+    .demo-btn:hover:not(:disabled) {
+      border-color: var(--accent);
+      color: var(--accent2);
+    }
+
+    .demo-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .demo-btn.loop { border-color: rgba(255,51,85,0.3); }
+    .demo-btn.loop:hover:not(:disabled) { border-color: var(--red); color: var(--red); }
+
+    .demo-btn.hallucinate { border-color: rgba(255,204,0,0.3); }
+    .demo-btn.hallucinate:hover:not(:disabled) { border-color: var(--yellow); color: var(--yellow); }
+
+    .demo-btn.drift { border-color: rgba(255,136,0,0.3); }
+    .demo-btn.drift:hover:not(:disabled) { border-color: var(--orange); color: var(--orange); }
+
+    #demo-status {
+      font-size: 9px;
+      color: var(--text-dim);
+      max-width: 280px;
+      text-align: right;
+    }
+
     /* ── Connection status ── */
     #conn-status {
       position: fixed;
@@ -641,6 +706,73 @@
 
 <!-- Connection status -->
 <div id="conn-status">⬤ Connecting...</div>
+
+<!-- Live Demo Controls -->
+<div id="demo-controls">
+  <div class="demo-label">Try It Live — Trigger Agent Run</div>
+  <div id="demo-buttons">
+    <button class="demo-btn" data-mode="normal" onclick="triggerDemo('normal')">Normal</button>
+    <button class="demo-btn loop" data-mode="loop" onclick="triggerDemo('loop')">Loop</button>
+    <button class="demo-btn hallucinate" data-mode="hallucinate" onclick="triggerDemo('hallucinate')">Hallucinate</button>
+    <button class="demo-btn drift" data-mode="drift" onclick="triggerDemo('drift')">Drift</button>
+  </div>
+  <div id="demo-status"></div>
+</div>
+
+<script>
+  const API_BASE = (() => {
+    if (window.location.port === '3000') return 'http://localhost:8001';
+    return '';
+  })();
+
+  let demoBusy = false;
+
+  async function triggerDemo(mode) {
+    if (demoBusy) return;
+    demoBusy = true;
+    setDemoButtonsDisabled(true);
+    const statusEl = document.getElementById('demo-status');
+    statusEl.textContent = `Running ${mode} mode... watch the feed & brain graph above`;
+    statusEl.style.color = 'var(--accent2)';
+
+    try {
+      const res = await fetch(`${API_BASE}/api/demo/trigger`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode }),
+      });
+
+      if (res.status === 429) {
+        statusEl.textContent = 'Another visitor is running a demo — try again in a few seconds.';
+        statusEl.style.color = 'var(--orange)';
+        return;
+      }
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        statusEl.textContent = `Error: ${err.detail || res.statusText}`;
+        statusEl.style.color = 'var(--red)';
+        return;
+      }
+
+      const data = await res.json();
+      statusEl.textContent = `Done — trace ${data.trace_id?.slice(0, 8) || ''}. ${data.message}`;
+      statusEl.style.color = 'var(--green)';
+    } catch (e) {
+      statusEl.textContent = `Network error: ${e.message}`;
+      statusEl.style.color = 'var(--red)';
+    } finally {
+      demoBusy = false;
+      setDemoButtonsDisabled(false);
+    }
+  }
+
+  function setDemoButtonsDisabled(disabled) {
+    document.querySelectorAll('.demo-btn').forEach((btn) => {
+      btn.disabled = disabled;
+    });
+  }
+</script>
 
 <script type="module" src="src/brain.js"></script>
 <script type="module" src="src/websocket.js"></script>

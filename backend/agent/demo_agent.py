@@ -17,13 +17,16 @@ _hec_token = ""
 _hec_url = ""
 _trace_id = ""
 _index = "agentwatch"
+# ── Live pipeline integration (set by demo_runner_lib for the public
+# demo). When set, _send() calls this with every event dict, in
+# addition to (or instead of) sending to Splunk HEC. ──
+_emit_callback = None
+
 _ctx2 = ssl.create_default_context()
 _ctx2.check_hostname = False
 _ctx2.verify_mode = ssl.CERT_NONE
 
 def _send(event_type, step_name, **kwargs):
-    if not _hec_token:
-        return
     event = {
         "event_type": event_type,
         "step_name": step_name,
@@ -33,6 +36,19 @@ def _send(event_type, step_name, **kwargs):
         "step_id": str(uuid.uuid4())[:8],
         **kwargs,
     }
+
+    # Live pipeline (public demo / local dashboard): emit to callback
+    # so the FastAPI backend can run anomaly detection + broadcast to
+    # connected browsers, independent of Splunk.
+    if _emit_callback is not None:
+        try:
+            _emit_callback(event)
+        except Exception:
+            pass
+
+    # Splunk HEC (original behavior): only if a token is configured.
+    if not _hec_token:
+        return
     try:
         payload = json.dumps({
             "index": _index,

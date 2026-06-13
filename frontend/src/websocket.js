@@ -15,7 +15,19 @@ import { checkRunComplete } from './autopsy_panel.js';
 import { addOrUpdateNode } from './brain.js';
 import { showAnomalyAlert } from './alerts.js';
 
-const WS_URL = window.__WS_URL || 'ws://localhost:8001/ws/browser';
+// In production (served from the FastAPI backend itself, e.g. on
+// Railway), derive the WS URL from the current page's host so it works
+// on whatever domain the app is deployed to. window.__WS_URL can still
+// override this for local dev (e.g. frontend on :3000, backend on :8001).
+const WS_URL = window.__WS_URL || (() => {
+  const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+  // Local dev convenience: if running the old `python -m http.server 3000`
+  // setup, fall back to localhost:8001 for the backend.
+  if (window.location.port === '3000') {
+    return 'ws://localhost:8001/ws/browser';
+  }
+  return `${proto}//${window.location.host}/ws/browser`;
+})();
 const connStatus = document.getElementById('conn-status');
 const feedList = document.getElementById('feed-list');
 
