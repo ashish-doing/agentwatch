@@ -413,15 +413,19 @@
       background: rgba(255,20,50,0.12);
       border: 1px solid var(--red);
       border-radius: 10px;
-      padding: 12px 14px;
+      padding: 10px 12px;
       animation: alert-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
       backdrop-filter: blur(12px);
-      font-size: 11px;
+      font-size: 10px;
     }
 
-    .anomaly-card .anomaly-title { font-size: 12px; }
-    .anomaly-card .anomaly-body { font-size: 10px; }
-    .anomaly-card .anomaly-actions .btn { font-size: 8px; padding: 5px 10px; }
+    .anomaly-card .anomaly-title { font-size: 11px; }
+    .anomaly-card .anomaly-body { font-size: 9px; }
+    .anomaly-card .anomaly-header { margin-bottom: 6px; }
+    .anomaly-card .anomaly-icon { font-size: 16px; }
+    .anomaly-card .anomaly-actions { margin-top: 8px; gap: 6px; flex-wrap: wrap; }
+    .anomaly-card .anomaly-actions .btn { font-size: 8px; padding: 4px 8px; }
+    .anomaly-card > div[style*="background:rgba(0,0,0,0.3)"] { padding: 6px 8px !important; margin: 6px 0 !important; }
 
     @keyframes alert-in {
       from { opacity: 0; transform: scale(0.9) translateY(-20px); }
@@ -581,19 +585,21 @@
     /* ── Live Demo Controls ── */
     #demo-controls {
       position: fixed;
-      bottom: 16px;
-      left: 16px;
+      top: 12px;
+      left: 320px;
+      right: 320px;
       z-index: 60;
       display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 6px;
+      flex-direction: row;
+      align-items: center;
+      gap: 10px;
       pointer-events: all;
       background: var(--panel);
       border: 1px solid var(--border);
       border-radius: 10px;
-      padding: 10px 12px;
-      max-width: 280px;
+      padding: 8px 14px;
+      max-width: none;
+      flex-wrap: wrap;
     }
 
     #demo-controls .demo-label {
@@ -644,14 +650,15 @@
     #demo-status {
       font-size: 9px;
       color: var(--text-dim);
-      max-width: 260px;
+      max-width: 320px;
       text-align: left;
+      flex: 1;
     }
 
     /* ── Connection status ── */
     #conn-status {
       position: fixed;
-      top: 76px;
+      bottom: 16px;
       left: 16px;
       font-size: 9px;
       letter-spacing: 2px;

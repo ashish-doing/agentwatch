@@ -70,8 +70,8 @@ export function showAnomalyAlert(event) {
     </div>
   `;
 
-  // Remove old cards beyond 2
-  while (overlay.children.length >= 2) {
+  // Remove old cards beyond 1 — keep only the latest anomaly visible
+  while (overlay.children.length >= 1) {
     overlay.removeChild(overlay.firstChild);
   }
   overlay.appendChild(card);
