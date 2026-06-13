@@ -1,0 +1,1314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AgentWatch — Agent Operations</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+
+  <style>
+    :root {
+      --bg: #050810;
+      --bg2: #080e1e;
+      --panel: rgba(8, 14, 30, 0.9);
+      --panel-solid: #080e1e;
+      --border: rgba(100, 160, 255, 0.13);
+      --border-bright: rgba(100, 160, 255, 0.28);
+      --accent: #4f8fff;
+      --accent2: #00e5ff;
+      --green: #00ff88;
+      --yellow: #ffcc00;
+      --orange: #ff8800;
+      --red: #ff3355;
+      --text: #c8d8f0;
+      --text-dim: #5a7090;
+      --text-bright: #e8f0ff;
+      --mono: 'Space Mono', monospace;
+      --sans: 'Syne', sans-serif;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--mono);
+      min-height: 100vh;
+    }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 2px; }
+
+    /* ── Top Nav ── */
+    #topnav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(5, 8, 16, 0.95);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(16px);
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      height: 56px;
+      gap: 32px;
+    }
+
+    .nav-logo {
+      font-family: var(--sans);
+      font-size: 18px;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--accent2), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.5px;
+      text-decoration: none;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 4px;
+      margin-left: 8px;
+    }
+
+    .nav-link {
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      text-decoration: none;
+      transition: all 0.15s;
+      border: 1px solid transparent;
+    }
+    .nav-link:hover { color: var(--text); border-color: var(--border); }
+    .nav-link.active {
+      color: var(--accent2);
+      background: rgba(0,229,255,0.07);
+      border-color: rgba(0,229,255,0.2);
+    }
+
+    .nav-right {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .live-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 9px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--green);
+    }
+    .live-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: pulse-dot 2s infinite;
+    }
+    @keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    /* ── Page Layout ── */
+    #page {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 24px 24px 48px;
+    }
+
+    /* ── Page Header ── */
+    #page-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 28px;
+    }
+
+    .page-title {
+      font-family: var(--sans);
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--text-bright);
+      letter-spacing: -0.5px;
+    }
+    .page-subtitle {
+      font-size: 10px;
+      color: var(--text-dim);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+
+    #header-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-top: 4px;
+    }
+
+    .hdr-btn {
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      border: 1px solid var(--border-bright);
+      background: var(--panel);
+      color: var(--text-dim);
+      transition: all 0.15s;
+    }
+    .hdr-btn:hover { color: var(--text); border-color: var(--accent); }
+    .hdr-btn.primary {
+      background: rgba(79,143,255,0.12);
+      border-color: var(--accent);
+      color: var(--accent2);
+    }
+    .hdr-btn.primary:hover { background: rgba(79,143,255,0.22); }
+
+    /* ── KPI Row ── */
+    #kpi-row {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .kpi-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px 18px;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+    .kpi-card:hover { border-color: var(--border-bright); }
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+    }
+    .kpi-card.cyan::before { background: var(--accent2); }
+    .kpi-card.green::before { background: var(--green); }
+    .kpi-card.red::before { background: var(--red); }
+    .kpi-card.orange::before { background: var(--orange); }
+    .kpi-card.yellow::before { background: var(--yellow); }
+    .kpi-card.blue::before { background: var(--accent); }
+
+    .kpi-label {
+      font-size: 8px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 8px;
+    }
+    .kpi-value {
+      font-family: var(--sans);
+      font-size: 26px;
+      font-weight: 800;
+      line-height: 1;
+      color: var(--text-bright);
+    }
+    .kpi-sub {
+      font-size: 8px;
+      color: var(--text-dim);
+      margin-top: 4px;
+    }
+    .kpi-delta {
+      font-size: 9px;
+      margin-top: 6px;
+    }
+    .kpi-delta.up { color: var(--green); }
+    .kpi-delta.down { color: var(--red); }
+
+    /* ── Two-col layout ── */
+    #main-grid {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    /* ── Section panel ── */
+    .section-panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .section-header {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .section-title {
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .pill {
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 8px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .pill.active-pill {
+      background: rgba(0,229,255,0.1);
+      border-color: rgba(0,229,255,0.3);
+      color: var(--accent2);
+    }
+    .pill.inactive-pill {
+      color: var(--text-dim);
+      border-color: var(--border);
+    }
+    .pill:hover { border-color: var(--border-bright); color: var(--text); }
+
+    /* ── Agent Table ── */
+    #agent-table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px;
+    }
+
+    thead tr {
+      border-bottom: 1px solid var(--border);
+    }
+
+    thead th {
+      padding: 10px 16px;
+      text-align: left;
+      font-size: 8px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      font-weight: 400;
+      white-space: nowrap;
+      cursor: pointer;
+      user-select: none;
+    }
+    thead th:hover { color: var(--text); }
+    thead th.sorted { color: var(--accent2); }
+
+    tbody tr {
+      border-bottom: 1px solid rgba(100,160,255,0.05);
+      transition: background 0.1s;
+      cursor: pointer;
+    }
+    tbody tr:hover { background: rgba(79,143,255,0.05); }
+    tbody tr.selected-row { background: rgba(0,229,255,0.06); }
+
+    tbody td {
+      padding: 12px 16px;
+      vertical-align: middle;
+    }
+
+    .td-agent {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .agent-icon {
+      width: 28px; height: 28px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      flex-shrink: 0;
+    }
+    .agent-name { font-weight: 700; color: var(--text-bright); font-size: 11px; }
+    .agent-id { font-size: 9px; color: var(--text-dim); margin-top: 1px; font-family: var(--mono); }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 9px;
+      border-radius: 20px;
+      font-size: 8px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      border: 1px solid transparent;
+    }
+    .status-badge.healthy { background: rgba(0,255,136,0.08); border-color: rgba(0,255,136,0.2); color: var(--green); }
+    .status-badge.warning { background: rgba(255,204,0,0.08); border-color: rgba(255,204,0,0.2); color: var(--yellow); }
+    .status-badge.critical { background: rgba(255,51,85,0.1); border-color: rgba(255,51,85,0.25); color: var(--red); }
+    .status-badge.idle { background: rgba(90,112,144,0.1); border-color: rgba(90,112,144,0.2); color: var(--text-dim); }
+
+    .status-dot {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .trust-cell {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .trust-mini-bar {
+      width: 56px; height: 3px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 2px;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .trust-mini-fill {
+      height: 100%;
+      border-radius: 2px;
+    }
+    .trust-val { font-size: 11px; color: var(--text); min-width: 32px; }
+
+    .mono-cell { font-family: var(--mono); color: var(--text-dim); font-size: 10px; }
+    .cost-cell { color: var(--accent2); font-family: var(--mono); font-size: 11px; }
+
+    .anomaly-count {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 22px;
+      height: 22px;
+      border-radius: 5px;
+      font-size: 10px;
+      font-weight: 700;
+    }
+    .anomaly-count.zero { color: var(--text-dim); }
+    .anomaly-count.low { background: rgba(255,204,0,0.1); color: var(--yellow); }
+    .anomaly-count.high { background: rgba(255,51,85,0.1); color: var(--red); }
+
+    .mode-tag {
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 8px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    .mode-tag.normal { background: rgba(0,255,136,0.08); color: var(--green); }
+    .mode-tag.loop { background: rgba(255,51,85,0.1); color: var(--red); }
+    .mode-tag.hallucinate { background: rgba(255,204,0,0.08); color: var(--yellow); }
+    .mode-tag.drift { background: rgba(255,136,0,0.1); color: var(--orange); }
+
+    .sparkline-cell canvas { display: block; }
+
+    .action-btn {
+      padding: 4px 10px;
+      border-radius: 5px;
+      font-family: var(--mono);
+      font-size: 8px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-dim);
+      transition: all 0.12s;
+    }
+    .action-btn:hover { border-color: var(--accent); color: var(--accent2); }
+
+    /* ── Right: Detail / Chart panels ── */
+    #right-col { display: flex; flex-direction: column; gap: 16px; }
+
+    .chart-panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .chart-body { padding: 16px 16px 12px; }
+
+    /* ── Bottom row ── */
+    #bottom-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+    }
+
+    /* ── Anomaly log ── */
+    .log-item {
+      padding: 10px 16px;
+      border-bottom: 1px solid rgba(100,160,255,0.05);
+      font-size: 10px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      transition: background 0.1s;
+    }
+    .log-item:hover { background: rgba(79,143,255,0.04); }
+    .log-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+    .log-msg { color: var(--text); flex: 1; line-height: 1.5; }
+    .log-time { color: var(--text-dim); font-size: 8px; flex-shrink: 0; }
+
+    /* ── SLO panel ── */
+    .slo-item {
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(100,160,255,0.05);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .slo-name { flex: 1; font-size: 10px; color: var(--text); }
+    .slo-bar-wrap { width: 80px; height: 4px; background: rgba(255,255,255,0.08); border-radius: 2px; overflow: hidden; }
+    .slo-fill { height: 100%; border-radius: 2px; transition: width 0.4s; }
+    .slo-pct { font-size: 10px; min-width: 36px; text-align: right; }
+
+    /* ── Cost panel ── */
+    .cost-row {
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(100,160,255,0.05);
+      font-size: 10px;
+    }
+    .cost-agent { color: var(--text); }
+    .cost-tokens { color: var(--text-dim); font-size: 9px; }
+    .cost-usd { color: var(--accent2); font-family: var(--mono); font-weight: 700; }
+
+    /* ── Empty state ── */
+    .empty-state {
+      padding: 40px 20px;
+      text-align: center;
+      color: var(--text-dim);
+      font-size: 10px;
+      line-height: 2.2;
+    }
+
+    /* ── Loading shimmer ── */
+    @keyframes shimmer {
+      0% { opacity: 0.4; }
+      50% { opacity: 0.7; }
+      100% { opacity: 0.4; }
+    }
+    .shimmer { animation: shimmer 1.5s infinite; }
+
+    /* ── Tooltip ── */
+    #tooltip {
+      position: fixed;
+      z-index: 500;
+      background: rgba(5,8,16,0.97);
+      border: 1px solid var(--border-bright);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 10px;
+      line-height: 1.8;
+      color: var(--text);
+      pointer-events: none;
+      display: none;
+      max-width: 220px;
+      backdrop-filter: blur(12px);
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 1100px) {
+      #kpi-row { grid-template-columns: repeat(3, 1fr); }
+      #main-grid { grid-template-columns: 1fr; }
+      #bottom-row { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Top Nav -->
+<nav id="topnav">
+  <a class="nav-logo" href="/">AgentWatch</a>
+  <div class="nav-links">
+    <a class="nav-link" href="/">Live Brain</a>
+    <a class="nav-link active" href="/ops.html">Agent Ops</a>
+  </div>
+  <div class="nav-right">
+    <div class="live-badge">
+      <div class="live-dot"></div>
+      <span id="nav-conn">Connecting</span>
+    </div>
+    <button class="hdr-btn primary" onclick="refreshAll()">↺ Refresh</button>
+  </div>
+</nav>
+
+<div id="page">
+
+  <!-- Page Header -->
+  <div id="page-header">
+    <div>
+      <div class="page-title">Agent Operations</div>
+      <div class="page-subtitle">CRM-style observability across all agent runs</div>
+    </div>
+    <div id="header-actions">
+      <select id="time-filter" onchange="refreshAll()" style="
+        background: var(--panel);
+        border: 1px solid var(--border-bright);
+        border-radius: 8px;
+        color: var(--text-dim);
+        font-family: var(--mono);
+        font-size: 9px;
+        padding: 8px 12px;
+        letter-spacing: 1px;
+        cursor: pointer;
+        outline: none;
+      ">
+        <option value="30">Last 30 runs</option>
+        <option value="10">Last 10 runs</option>
+        <option value="all">All runs</option>
+      </select>
+      <button class="hdr-btn" onclick="triggerDemo('normal')">▶ Run Agent</button>
+      <button class="hdr-btn primary" onclick="window.location='/'">← Live View</button>
+    </div>
+  </div>
+
+  <!-- KPI Row -->
+  <div id="kpi-row">
+    <div class="kpi-card cyan">
+      <div class="kpi-label">Total Runs</div>
+      <div class="kpi-value" id="kpi-runs">—</div>
+      <div class="kpi-sub" id="kpi-runs-sub">loading...</div>
+    </div>
+    <div class="kpi-card green">
+      <div class="kpi-label">Avg Trust Score</div>
+      <div class="kpi-value" id="kpi-trust">—</div>
+      <div class="kpi-sub" id="kpi-trust-sub">across all runs</div>
+    </div>
+    <div class="kpi-card red">
+      <div class="kpi-label">Total Anomalies</div>
+      <div class="kpi-value" id="kpi-anomalies">—</div>
+      <div class="kpi-sub" id="kpi-anomalies-sub">detected</div>
+    </div>
+    <div class="kpi-card orange">
+      <div class="kpi-label">Total Tokens</div>
+      <div class="kpi-value" id="kpi-tokens">—</div>
+      <div class="kpi-sub" id="kpi-tokens-sub">processed</div>
+    </div>
+    <div class="kpi-card yellow">
+      <div class="kpi-label">Est. Cost</div>
+      <div class="kpi-value" id="kpi-cost">—</div>
+      <div class="kpi-sub" id="kpi-cost-sub">@ $0.15/1M tokens</div>
+    </div>
+    <div class="kpi-card blue">
+      <div class="kpi-label">Live Events</div>
+      <div class="kpi-value" id="kpi-events">—</div>
+      <div class="kpi-sub" id="kpi-events-sub">in buffer</div>
+    </div>
+  </div>
+
+  <!-- Main Grid: Table + Right Col -->
+  <div id="main-grid">
+
+    <!-- Agent Runs Table -->
+    <div class="section-panel">
+      <div class="section-header">
+        <div class="section-title">
+          <span>🗂</span> Agent Run History
+        </div>
+        <div class="section-actions">
+          <span class="pill active-pill" onclick="setFilter('all', this)">All</span>
+          <span class="pill inactive-pill" onclick="setFilter('normal', this)">Normal</span>
+          <span class="pill inactive-pill" onclick="setFilter('loop', this)">Loop</span>
+          <span class="pill inactive-pill" onclick="setFilter('hallucinate', this)">Hallucinate</span>
+          <span class="pill inactive-pill" onclick="setFilter('drift', this)">Drift</span>
+        </div>
+      </div>
+      <div id="agent-table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th onclick="sortBy('run_id')">Run</th>
+              <th onclick="sortBy('mode')">Mode</th>
+              <th onclick="sortBy('status')">Status</th>
+              <th onclick="sortBy('avg_trust')" class="sorted">Trust ↓</th>
+              <th onclick="sortBy('anomaly_count')">Anomalies</th>
+              <th onclick="sortBy('total_tokens')">Tokens</th>
+              <th onclick="sortBy('cost_usd')">Cost</th>
+              <th onclick="sortBy('duration_s')">Duration</th>
+              <th onclick="sortBy('timestamp')">Time</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="agent-tbody">
+            <tr><td colspan="10"><div class="empty-state shimmer">Loading agent runs...</div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Right Column -->
+    <div id="right-col">
+
+      <!-- Trust Trend Chart -->
+      <div class="chart-panel">
+        <div class="section-header">
+          <div class="section-title">📈 Trust Trend</div>
+          <span style="font-size:9px;color:var(--text-dim)" id="trend-range">last 30 runs</span>
+        </div>
+        <div class="chart-body">
+          <canvas id="trust-chart" height="120"></canvas>
+        </div>
+      </div>
+
+      <!-- Anomaly Breakdown Chart -->
+      <div class="chart-panel">
+        <div class="section-header">
+          <div class="section-title">🎯 Anomaly Types</div>
+        </div>
+        <div class="chart-body">
+          <canvas id="anomaly-chart" height="120"></canvas>
+        </div>
+      </div>
+
+      <!-- SLO Panel -->
+      <div class="chart-panel">
+        <div class="section-header">
+          <div class="section-title">📊 SLO Status</div>
+          <span style="font-size:9px;color:var(--text-dim)">live</span>
+        </div>
+        <div id="slo-list"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Bottom Row -->
+  <div id="bottom-row">
+
+    <!-- Anomaly Log -->
+    <div class="section-panel">
+      <div class="section-header">
+        <div class="section-title">⚠️ Anomaly Log</div>
+        <span style="font-size:9px;color:var(--text-dim)" id="anomaly-log-count">—</span>
+      </div>
+      <div id="anomaly-log-list" style="max-height:280px;overflow-y:auto"></div>
+    </div>
+
+    <!-- Cost Tracker -->
+    <div class="section-panel">
+      <div class="section-header">
+        <div class="section-title">💰 Cost per Run</div>
+        <span style="font-size:9px;color:var(--accent2)" id="total-cost-badge">$0.00</span>
+      </div>
+      <div id="cost-list" style="max-height:280px;overflow-y:auto"></div>
+    </div>
+
+    <!-- Live Stats -->
+    <div class="section-panel">
+      <div class="section-header">
+        <div class="section-title">🔴 Live Activity</div>
+        <span class="live-badge" style="font-size:8px">
+          <div class="live-dot"></div> streaming
+        </span>
+      </div>
+      <div id="live-feed" style="max-height:280px;overflow-y:auto"></div>
+    </div>
+
+  </div>
+
+</div>
+
+<div id="tooltip"></div>
+
+<script>
+// ── Config ──────────────────────────────────────────
+const API_BASE = (() => {
+  if (window.location.port === '3000') return 'http://localhost:8001';
+  return window.location.origin;
+})();
+
+// ── State ────────────────────────────────────────────
+let allRuns = [];
+let currentFilter = 'all';
+let sortKey = 'timestamp';
+let sortDesc = true;
+let trustChart = null;
+let anomalyChart = null;
+let ws = null;
+let liveEvents = [];
+
+// ── Token cost model (Gemini flash approximation) ───
+const COST_PER_1M = 0.15;
+function tokensToCost(t) { return ((t / 1_000_000) * COST_PER_1M); }
+function fmtCost(usd) { return usd < 0.01 ? '<$0.01' : `$${usd.toFixed(4)}`; }
+function fmtTokens(t) { return t >= 1000 ? `${(t/1000).toFixed(1)}k` : `${t}`; }
+function fmtTime(ts) {
+  const d = new Date(ts * 1000);
+  return d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+function timeAgo(ts) {
+  const s = Math.floor(Date.now()/1000 - ts);
+  if (s < 60) return `${s}s ago`;
+  if (s < 3600) return `${Math.floor(s/60)}m ago`;
+  return `${Math.floor(s/3600)}h ago`;
+}
+
+// ── Trust color ──────────────────────────────────────
+function trustColor(t) {
+  if (t >= 0.8) return 'var(--green)';
+  if (t >= 0.5) return 'var(--yellow)';
+  if (t >= 0.3) return 'var(--orange)';
+  return 'var(--red)';
+}
+
+// ── Derive run records from event buffer + history ───
+function buildRunsFromBuffer(events, historyRuns) {
+  // Merge: history runs are authoritative, supplement with live buffer data
+  const byTrace = {};
+
+  events.forEach(ev => {
+    const tid = ev.trace_id || 'unknown';
+    if (!byTrace[tid]) {
+      byTrace[tid] = {
+        run_id: tid.slice(0,8),
+        trace_id: tid,
+        mode: ev.mode || 'normal',
+        timestamp: ev.timestamp || Date.now()/1000,
+        events: [],
+        anomalies: [],
+        tokens: 0,
+        durations: [],
+      };
+    }
+    byTrace[tid].events.push(ev);
+    if (ev.llm_total_tokens) byTrace[tid].tokens += parseInt(ev.llm_total_tokens) || 0;
+    if (ev.duration_ms) byTrace[tid].durations.push(parseFloat(ev.duration_ms));
+    if (ev.event_type === 'anomaly') byTrace[tid].anomalies.push(ev);
+    if (ev.timestamp < byTrace[tid].timestamp) byTrace[tid].timestamp = ev.timestamp;
+  });
+
+  // Build final run list: prefer history, fill gaps from buffer
+  const historyMap = {};
+  (historyRuns || []).forEach(r => { historyMap[r.run_id] = r; });
+
+  const runs = Object.values(byTrace).map(t => {
+    const trust_scores = t.events.filter(e => e.trust_score != null).map(e => parseFloat(e.trust_score));
+    const avg_trust = trust_scores.length ? trust_scores.reduce((a,b)=>a+b,0)/trust_scores.length : 1.0;
+    const total_duration_s = t.durations.length ? t.durations.reduce((a,b)=>a+b,0)/1000 : 0;
+    const status = t.anomalies.some(a => a.severity === 'critical') ? 'critical'
+                 : t.anomalies.length > 0 ? 'warning' : 'healthy';
+    return {
+      run_id: t.run_id,
+      trace_id: t.trace_id,
+      mode: t.mode,
+      timestamp: t.timestamp,
+      avg_trust: Math.min(1, Math.max(0, avg_trust)),
+      anomaly_count: t.anomalies.length,
+      anomaly_types: [...new Set(t.anomalies.map(a => a.anomaly_type))],
+      total_tokens: t.tokens,
+      cost_usd: tokensToCost(t.tokens),
+      duration_s: total_duration_s,
+      event_count: t.events.length,
+      status,
+    };
+  });
+
+  // Also add history-only runs not in buffer
+  (historyRuns || []).forEach(hr => {
+    if (!Object.values(byTrace).find(t => t.run_id === hr.run_id)) {
+      runs.push({
+        run_id: hr.run_id,
+        trace_id: hr.run_id,
+        mode: hr.mode || 'normal',
+        timestamp: hr.timestamp,
+        avg_trust: hr.avg_trust || 1.0,
+        anomaly_count: hr.anomaly_count || 0,
+        anomaly_types: [],
+        total_tokens: 0,
+        cost_usd: 0,
+        duration_s: 0,
+        event_count: 0,
+        status: (hr.anomaly_count || 0) > 0 ? 'warning' : 'healthy',
+      });
+    }
+  });
+
+  runs.sort((a,b) => b.timestamp - a.timestamp);
+  return runs;
+}
+
+// ── Fetch everything ─────────────────────────────────
+async function fetchAll() {
+  const [evRes, statsRes, histRes] = await Promise.allSettled([
+    fetch(`${API_BASE}/api/events?limit=500`),
+    fetch(`${API_BASE}/api/stats`),
+    fetch(`${API_BASE}/api/history`),
+  ]);
+
+  let events = [], stats = {}, historyRuns = [];
+  if (evRes.status === 'fulfilled' && evRes.value.ok) {
+    const d = await evRes.value.json(); events = d.events || [];
+  }
+  if (statsRes.status === 'fulfilled' && statsRes.value.ok) {
+    stats = await statsRes.value.json();
+  }
+  if (histRes.status === 'fulfilled' && histRes.value.ok) {
+    const d = await histRes.value.json(); historyRuns = d.runs || [];
+  }
+
+  return { events, stats, historyRuns };
+}
+
+// ── Main refresh ─────────────────────────────────────
+async function refreshAll() {
+  try {
+    const { events, stats, historyRuns } = await fetchAll();
+    allRuns = buildRunsFromBuffer(events, historyRuns);
+    updateKPIs(allRuns, stats);
+    renderTable();
+    renderTrustChart();
+    renderAnomalyChart();
+    renderSLO(allRuns, stats);
+    renderAnomalyLog(events);
+    renderCostList(allRuns);
+    document.getElementById('nav-conn').textContent = 'Connected';
+  } catch(e) {
+    console.error('Refresh error:', e);
+    document.getElementById('nav-conn').textContent = 'Offline';
+  }
+}
+
+// ── KPIs ─────────────────────────────────────────────
+function updateKPIs(runs, stats) {
+  document.getElementById('kpi-runs').textContent = runs.length || stats.agents || '0';
+  document.getElementById('kpi-runs-sub').textContent = `${runs.filter(r=>r.status==='healthy').length} healthy`;
+
+  const avgTrust = runs.length
+    ? runs.reduce((s,r)=>s+r.avg_trust,0)/runs.length
+    : (stats.avg_trust || 1.0);
+  const trustEl = document.getElementById('kpi-trust');
+  trustEl.textContent = `${Math.round(avgTrust*100)}%`;
+  trustEl.style.color = trustColor(avgTrust);
+
+  const totalAnomalies = runs.reduce((s,r)=>s+r.anomaly_count,0) || stats.anomalies || 0;
+  document.getElementById('kpi-anomalies').textContent = totalAnomalies;
+  document.getElementById('kpi-anomalies-sub').textContent =
+    `${runs.filter(r=>r.status==='critical').length} critical runs`;
+
+  const totalTokens = runs.reduce((s,r)=>s+r.total_tokens,0);
+  document.getElementById('kpi-tokens').textContent = totalTokens >= 1000
+    ? `${(totalTokens/1000).toFixed(1)}k` : totalTokens || (stats.total_events || '—');
+  document.getElementById('kpi-tokens-sub').textContent = 'processed';
+
+  const totalCost = runs.reduce((s,r)=>s+r.cost_usd,0);
+  document.getElementById('kpi-cost').textContent = fmtCost(totalCost);
+
+  document.getElementById('kpi-events').textContent = stats.total_events || '—';
+  document.getElementById('kpi-events-sub').textContent =
+    `${stats.browser_connections || 0} watching`;
+}
+
+// ── Table ────────────────────────────────────────────
+let activeRow = null;
+
+function setFilter(f, el) {
+  currentFilter = f;
+  document.querySelectorAll('.pill').forEach(p => {
+    p.className = p.className.replace('active-pill','inactive-pill');
+  });
+  el.className = el.className.replace('inactive-pill','active-pill');
+  renderTable();
+}
+
+function sortBy(key) {
+  if (sortKey === key) sortDesc = !sortDesc;
+  else { sortKey = key; sortDesc = true; }
+  document.querySelectorAll('thead th').forEach(th => th.className = '');
+  event.target.className = 'sorted';
+  renderTable();
+}
+
+function renderTable() {
+  let runs = allRuns.slice();
+  if (currentFilter !== 'all') runs = runs.filter(r => r.mode === currentFilter);
+  runs.sort((a,b) => {
+    const va = a[sortKey], vb = b[sortKey];
+    if (va === undefined) return 1;
+    if (vb === undefined) return -1;
+    return sortDesc ? (vb > va ? 1 : -1) : (va > vb ? 1 : -1);
+  });
+
+  const tbody = document.getElementById('agent-tbody');
+  if (!runs.length) {
+    tbody.innerHTML = `<tr><td colspan="10"><div class="empty-state">
+      No agent runs yet.<br>
+      <button class="hdr-btn primary" style="margin-top:12px;pointer-events:all" onclick="triggerDemo('loop')">▶ Trigger Loop Demo</button>
+    </div></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = runs.map((r, i) => {
+    const tc = trustColor(r.avg_trust);
+    const ac = r.anomaly_count === 0 ? 'zero' : r.anomaly_count <= 3 ? 'low' : 'high';
+    const modeIcons = {normal:'🟢',loop:'🔴',hallucinate:'🟡',drift:'🟠'};
+    const icon = modeIcons[r.mode] || '⚪';
+    const statusLabel = r.status === 'healthy' ? 'Healthy' : r.status === 'warning' ? 'Warning' : 'Critical';
+    return `<tr class="${activeRow === r.trace_id ? 'selected-row' : ''}" onclick="selectRow('${r.trace_id}', this)">
+      <td>
+        <div class="td-agent">
+          <div class="agent-icon" style="background:rgba(79,143,255,0.08);border:1px solid var(--border)">${icon}</div>
+          <div>
+            <div class="agent-name">Run #${runs.length - i}</div>
+            <div class="agent-id">${r.run_id}...</div>
+          </div>
+        </div>
+      </td>
+      <td><span class="mode-tag ${r.mode}">${r.mode}</span></td>
+      <td><span class="status-badge ${r.status}"><span class="status-dot"></span>${statusLabel}</span></td>
+      <td>
+        <div class="trust-cell">
+          <div class="trust-mini-bar">
+            <div class="trust-mini-fill" style="width:${Math.round(r.avg_trust*100)}%;background:${tc}"></div>
+          </div>
+          <span class="trust-val" style="color:${tc}">${Math.round(r.avg_trust*100)}%</span>
+        </div>
+      </td>
+      <td><span class="anomaly-count ${ac}">${r.anomaly_count}</span></td>
+      <td class="mono-cell">${fmtTokens(r.total_tokens)}</td>
+      <td class="cost-cell">${fmtCost(r.cost_usd)}</td>
+      <td class="mono-cell">${r.duration_s > 0 ? r.duration_s.toFixed(1)+'s' : '—'}</td>
+      <td class="mono-cell" style="font-size:9px">${timeAgo(r.timestamp)}</td>
+      <td>
+        <div style="display:flex;gap:4px">
+          <button class="action-btn" onclick="event.stopPropagation();viewTrace('${r.trace_id}')">Splunk</button>
+          <button class="action-btn" onclick="event.stopPropagation();exportRun('${r.trace_id}')">PDF</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function selectRow(traceId, tr) {
+  document.querySelectorAll('tbody tr').forEach(r => r.classList.remove('selected-row'));
+  tr.classList.add('selected-row');
+  activeRow = traceId;
+}
+
+// ── Trust trend chart ─────────────────────────────────
+function renderTrustChart() {
+  const runs = [...allRuns].sort((a,b)=>a.timestamp-b.timestamp).slice(-20);
+  const ctx = document.getElementById('trust-chart').getContext('2d');
+
+  if (trustChart) trustChart.destroy();
+  trustChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: runs.map(r => r.mode || r.run_id),
+      datasets: [{
+        label: 'Avg Trust',
+        data: runs.map(r => r.avg_trust),
+        borderColor: '#00e5ff',
+        backgroundColor: ctx => {
+          const g = ctx.chart.ctx.createLinearGradient(0, 0, 0, 120);
+          g.addColorStop(0, 'rgba(0,229,255,0.15)');
+          g.addColorStop(1, 'rgba(0,229,255,0)');
+          return g;
+        },
+        borderWidth: 2,
+        pointRadius: 3,
+        pointBackgroundColor: runs.map(r => trustColor(r.avg_trust)),
+        tension: 0.4,
+        fill: true,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 500 },
+      plugins: { legend: { display: false }, tooltip: {
+        backgroundColor: 'rgba(5,8,16,0.95)',
+        borderColor: 'rgba(100,160,255,0.2)',
+        borderWidth: 1,
+        titleColor: '#5a7090',
+        bodyColor: '#00e5ff',
+        callbacks: {
+          label: ctx => `Trust: ${Math.round(ctx.raw*100)}%`
+        }
+      }},
+      scales: {
+        x: { display: false },
+        y: {
+          min: 0, max: 1,
+          grid: { color: 'rgba(100,160,255,0.05)' },
+          ticks: { color: '#5a7090', font: { family: 'Space Mono', size: 8 }, maxTicksLimit: 4,
+            callback: v => `${Math.round(v*100)}%` }
+        }
+      }
+    }
+  });
+  document.getElementById('trend-range').textContent = `last ${runs.length} runs`;
+}
+
+// ── Anomaly breakdown doughnut ────────────────────────
+function renderAnomalyChart() {
+  const counts = { loop: 0, token_spike: 0, latency_drift: 0, error_burst: 0, trust_collapse: 0 };
+  allRuns.forEach(r => {
+    (r.anomaly_types || []).forEach(t => { if (counts[t] !== undefined) counts[t]++; });
+  });
+
+  const labels = Object.keys(counts).map(k => k.replace('_',' '));
+  const data = Object.values(counts);
+  const colors = ['#ff3355','#4f8fff','#ff8800','#ffcc00','#00e5ff'];
+
+  const ctx = document.getElementById('anomaly-chart').getContext('2d');
+  if (anomalyChart) anomalyChart.destroy();
+
+  if (data.every(v => v === 0)) {
+    anomalyChart = new Chart(ctx, {
+      type: 'doughnut',
+      data: { labels: ['No anomalies'], datasets: [{ data: [1], backgroundColor: ['rgba(90,112,144,0.2)'], borderWidth: 0 }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: {
+        legend: { display: true, labels: { color: '#5a7090', font: { family: 'Space Mono', size: 9 }, boxWidth: 10 } },
+        tooltip: { enabled: false }
+      }}
+    });
+    return;
+  }
+
+  anomalyChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels,
+      datasets: [{
+        data,
+        backgroundColor: colors.map(c => c + '33'),
+        borderColor: colors,
+        borderWidth: 1.5,
+        hoverOffset: 4,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: true, position: 'bottom', labels: {
+          color: '#5a7090', font: { family: 'Space Mono', size: 8 }, boxWidth: 8, padding: 8
+        }},
+        tooltip: {
+          backgroundColor: 'rgba(5,8,16,0.95)',
+          borderColor: 'rgba(100,160,255,0.2)',
+          borderWidth: 1,
+          titleColor: '#5a7090',
+          bodyColor: '#c8d8f0',
+        }
+      }
+    }
+  });
+}
+
+// ── SLO Panel ─────────────────────────────────────────
+function renderSLO(runs, stats) {
+  const totalRuns = runs.length || 1;
+  const healthyRuns = runs.filter(r => r.status === 'healthy').length;
+  const noLoops = runs.filter(r => !r.anomaly_types?.includes('loop')).length;
+  const lowCost = runs.filter(r => r.cost_usd < 0.001).length;
+  const fastRuns = runs.filter(r => r.duration_s < 30 || r.duration_s === 0).length;
+
+  const slos = [
+    { name: 'Agent Uptime', pct: healthyRuns/totalRuns, target: 0.99 },
+    { name: 'Loop-Free Runs', pct: noLoops/totalRuns, target: 0.95 },
+    { name: 'Cost < $0.001/run', pct: lowCost/totalRuns, target: 0.90 },
+    { name: 'Run < 30s', pct: fastRuns/totalRuns, target: 0.95 },
+    { name: 'Avg Trust > 70%', pct: (stats.avg_trust || 1.0) > 0.7 ? 1 : (stats.avg_trust || 1.0)/0.7, target: 1.0 },
+  ];
+
+  document.getElementById('slo-list').innerHTML = slos.map(s => {
+    const pctNum = Math.round(s.pct * 100);
+    const ok = s.pct >= s.target;
+    const color = ok ? 'var(--green)' : s.pct >= s.target * 0.9 ? 'var(--yellow)' : 'var(--red)';
+    return `<div class="slo-item">
+      <div class="slo-name">${s.name}</div>
+      <div class="slo-bar-wrap">
+        <div class="slo-fill" style="width:${pctNum}%;background:${color}"></div>
+      </div>
+      <div class="slo-pct" style="color:${color}">${pctNum}%</div>
+    </div>`;
+  }).join('');
+}
+
+// ── Anomaly Log ───────────────────────────────────────
+function renderAnomalyLog(events) {
+  const anomalies = events.filter(e => e.event_type === 'anomaly').slice().reverse().slice(0,20);
+  const el = document.getElementById('anomaly-log-list');
+  document.getElementById('anomaly-log-count').textContent = `${anomalies.length} events`;
+
+  if (!anomalies.length) {
+    el.innerHTML = `<div class="empty-state">No anomalies recorded.<br>All agents healthy ✓</div>`;
+    return;
+  }
+
+  const icons = { loop:'🔁', token_spike:'📈', latency_drift:'⏱', error_burst:'💥', trust_collapse:'📉' };
+  el.innerHTML = anomalies.map(a => {
+    const icon = icons[a.anomaly_type] || '⚠️';
+    const msg = a.reasoning_content || a.anomaly_type?.replace('_',' ') || 'Anomaly';
+    const t = fmtTime(a.timestamp || Date.now()/1000);
+    return `<div class="log-item">
+      <span class="log-icon">${icon}</span>
+      <div class="log-msg">${msg.slice(0,80)}${msg.length>80?'...':''}</div>
+      <span class="log-time">${t}</span>
+    </div>`;
+  }).join('');
+}
+
+// ── Cost list ─────────────────────────────────────────
+function renderCostList(runs) {
+  const sorted = [...runs].sort((a,b)=>b.cost_usd-a.cost_usd).slice(0,15);
+  const total = runs.reduce((s,r)=>s+r.cost_usd,0);
+  document.getElementById('total-cost-badge').textContent = fmtCost(total);
+
+  const el = document.getElementById('cost-list');
+  if (!sorted.length || sorted.every(r=>r.total_tokens===0)) {
+    el.innerHTML = `<div class="empty-state">Cost data available<br>after agent runs with token tracking.</div>`;
+    return;
+  }
+
+  el.innerHTML = sorted.filter(r=>r.total_tokens>0).map((r,i) => `
+    <div class="cost-row">
+      <div>
+        <div class="cost-agent">Run #${i+1} · <span class="mode-tag ${r.mode}" style="padding:1px 6px;font-size:7px">${r.mode}</span></div>
+        <div class="cost-tokens">${fmtTokens(r.total_tokens)} tokens · ${timeAgo(r.timestamp)}</div>
+      </div>
+      <div class="cost-usd">${fmtCost(r.cost_usd)}</div>
+    </div>
+  `).join('') || `<div class="empty-state">No token data yet.</div>`;
+}
+
+// ── Live feed via WebSocket ───────────────────────────
+function connectWS() {
+  const wsUrl = API_BASE.replace('http','ws') + '/ws/browser';
+  ws = new WebSocket(wsUrl);
+
+  ws.onopen = () => {
+    document.getElementById('nav-conn').textContent = 'Live';
+  };
+
+  ws.onmessage = (msg) => {
+    try {
+      const payload = JSON.parse(msg.data);
+      if (payload.type === 'replay') {
+        liveEvents = payload.events || [];
+      } else if (payload.type === 'event') {
+        liveEvents.unshift(payload.data);
+        if (liveEvents.length > 200) liveEvents.pop();
+        renderLiveFeed();
+        // Auto-refresh KPIs on anomaly
+        if (payload.data?.event_type === 'anomaly') {
+          setTimeout(refreshAll, 500);
+        }
+      }
+    } catch(e) {}
+  };
+
+  ws.onclose = () => {
+    document.getElementById('nav-conn').textContent = 'Reconnecting...';
+    setTimeout(connectWS, 3000);
+  };
+  ws.onerror = () => ws.close();
+}
+
+function renderLiveFeed() {
+  const el = document.getElementById('live-feed');
+  const recent = liveEvents.slice(0, 20);
+  if (!recent.length) {
+    el.innerHTML = `<div class="empty-state">Waiting for events...<br>Trigger a demo run to see live data.</div>`;
+    return;
+  }
+  const typeColors = {
+    llm_call:'var(--accent)', tool_call:'var(--accent2)',
+    step_start:'var(--text-dim)', step_end:'var(--green)',
+    anomaly:'var(--red)', error:'var(--orange)',
+  };
+  el.innerHTML = recent.map(e => {
+    const color = typeColors[e.event_type] || 'var(--text-dim)';
+    const name = e.step_name || e.tool_name || e.event_type || '—';
+    const trust = e.trust_score != null ? ` · ${Math.round(e.trust_score*100)}%` : '';
+    return `<div class="log-item">
+      <span style="width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0;margin-top:3px"></span>
+      <div class="log-msg">
+        <span style="color:${color};font-size:8px;letter-spacing:1px;text-transform:uppercase">${e.event_type}</span>
+        · <span style="color:var(--text)">${name}</span>
+        <span style="color:var(--text-dim)">${trust}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── Actions ───────────────────────────────────────────
+function viewTrace(traceId) {
+  const splunkUrl = window.__SPLUNK_URL || 'http://localhost:8000';
+  const spl = encodeURIComponent(`search index=agentwatch trace_id=${traceId} | sort -_time | table _time, event_type, step_name, trust_score, tool_name`);
+  window.open(`${splunkUrl}/en-US/app/search/search?q=${spl}&earliest=-1h&latest=now`, '_blank');
+}
+
+async function exportRun(traceId) {
+  const run = allRuns.find(r => r.trace_id === traceId);
+  if (!run) return;
+  try {
+    const res = await fetch(`${API_BASE}/api/export/incident`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        trace_id: traceId,
+        anomaly_data: { ...run, agent_id: run.run_id },
+        foundation_sec_reasoning: { explanation: `Run ${run.run_id} — ${run.anomaly_count} anomalies detected.` },
+      }),
+    });
+    if (!res.ok) { alert('Export failed — trigger a run first'); return; }
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `agentwatch-run-${traceId.slice(0,8)}.pdf`;
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a); URL.revokeObjectURL(url);
+  } catch(e) { alert(`Export error: ${e.message}`); }
+}
+
+async function triggerDemo(mode) {
+  try {
+    await fetch(`${API_BASE}/api/demo/trigger`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mode }),
+    });
+    setTimeout(refreshAll, 2000);
+  } catch(e) {}
+}
+
+// ── Init ─────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  refreshAll();
+  connectWS();
+  renderLiveFeed();
+  setInterval(refreshAll, 15000);
+});
+</script>
+</body>
+</html>

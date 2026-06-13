@@ -364,5 +364,10 @@ if FRONTEND_DIR.exists():
     async def serve_index():
         index_path = FRONTEND_DIR / "index.html"
         return FileResponse(str(index_path))
+
+    @app.get("/ops")
+    async def serve_ops():
+        ops_path = FRONTEND_DIR / "ops.html"
+        return FileResponse(str(ops_path))    
 else:
     logger.warning(f"Frontend directory not found at {FRONTEND_DIR} — static serving disabled.")
