@@ -55,7 +55,7 @@
       pointer-events: none;
       display: grid;
       grid-template-columns: 280px 1fr 300px;
-      grid-template-rows: 64px 1fr 56px 100px 110px;
+      grid-template-rows: 64px 1fr 90px 110px 160px;
       gap: 0;
       padding: 12px;
     }
@@ -288,6 +288,12 @@
       display: flex;
       gap: 0;
       overflow: hidden;
+      min-height: 0;
+    }
+
+    #query-panel {
+      min-height: 0;
+      overflow-y: auto;
     }
 
     #sparklines-row {
@@ -296,11 +302,21 @@
       pointer-events: all;
       display: flex;
       align-items: stretch;
+      gap: 8px;
+      padding: 8px 0;
+    }
+
+    #sparklines-row > div {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 12px;
     }
 
     #timeline-panel {
       grid-column: 1 / -1;
       grid-row: 4;
+      margin: 0 0 4px 0;
     }
 
     #query-panel {
@@ -353,13 +369,16 @@
       color: var(--accent2);
       overflow: auto;
       flex: 1;
+      max-height: 60px;
     }
 
     #results-panel {
-      width: 340px;
+      width: 320px;
+      flex-shrink: 0;
       padding: 12px 16px;
       overflow-y: auto;
       font-size: 10px;
+      border-left: 1px solid var(--border);
     }
 
     .result-row {
@@ -455,7 +474,7 @@
       position: fixed;
       right: 16px;
       top: 76px;
-      bottom: 130px;
+      bottom: 180px;
       width: 380px;
       z-index: 95;
       display: none;
@@ -562,14 +581,19 @@
     /* ── Live Demo Controls ── */
     #demo-controls {
       position: fixed;
-      bottom: 130px;
-      right: 16px;
+      bottom: 16px;
+      left: 16px;
       z-index: 60;
       display: flex;
       flex-direction: column;
-      align-items: flex-end;
-      gap: 8px;
+      align-items: flex-start;
+      gap: 6px;
       pointer-events: all;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      max-width: 280px;
     }
 
     #demo-controls .demo-label {
@@ -620,21 +644,24 @@
     #demo-status {
       font-size: 9px;
       color: var(--text-dim);
-      max-width: 280px;
-      text-align: right;
+      max-width: 260px;
+      text-align: left;
     }
 
     /* ── Connection status ── */
     #conn-status {
       position: fixed;
-      bottom: 16px;
-      left: 50%;
-      transform: translateX(-50%);
+      top: 76px;
+      left: 16px;
       font-size: 9px;
       letter-spacing: 2px;
       text-transform: uppercase;
       color: var(--text-dim);
       z-index: 50;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 4px 10px;
     }
 
     /* ── Splunk deep-link button ── */
