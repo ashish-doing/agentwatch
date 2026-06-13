@@ -55,7 +55,7 @@
       pointer-events: none;
       display: grid;
       grid-template-columns: 280px 1fr 300px;
-      grid-template-rows: 64px 1fr 80px 80px 180px;
+      grid-template-rows: 64px 1fr 56px 100px 110px;
       gap: 0;
       padding: 12px;
     }
@@ -279,7 +279,7 @@
     /* ── Bottom — AI Assistant ── */
     #ai-assistant {
       grid-column: 1 / -1;
-      grid-row: 3;
+      grid-row: 5;
       pointer-events: all;
       background: var(--panel);
       border: 1px solid var(--border);
@@ -288,6 +288,19 @@
       display: flex;
       gap: 0;
       overflow: hidden;
+    }
+
+    #sparklines-row {
+      grid-column: 1 / -1;
+      grid-row: 3;
+      pointer-events: all;
+      display: flex;
+      align-items: stretch;
+    }
+
+    #timeline-panel {
+      grid-column: 1 / -1;
+      grid-row: 4;
     }
 
     #query-panel {
@@ -362,25 +375,34 @@
     /* ── Anomaly Alert Overlay ── */
     #anomaly-overlay {
       position: fixed;
-      top: 80px;
-      left: 50%;
-      transform: translateX(-50%);
+      top: 76px;
+      right: 16px;
       z-index: 100;
       display: none;
       flex-direction: column;
       gap: 8px;
-      width: 500px;
+      width: 320px;
+      max-height: calc(100vh - 200px);
+      overflow-y: auto;
       pointer-events: all;
     }
+
+    #anomaly-overlay::-webkit-scrollbar { width: 3px; }
+    #anomaly-overlay::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
     .anomaly-card {
       background: rgba(255,20,50,0.12);
       border: 1px solid var(--red);
-      border-radius: 12px;
-      padding: 16px 20px;
+      border-radius: 10px;
+      padding: 12px 14px;
       animation: alert-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
       backdrop-filter: blur(12px);
+      font-size: 11px;
     }
+
+    .anomaly-card .anomaly-title { font-size: 12px; }
+    .anomaly-card .anomaly-body { font-size: 10px; }
+    .anomaly-card .anomaly-actions .btn { font-size: 8px; padding: 5px 10px; }
 
     @keyframes alert-in {
       from { opacity: 0; transform: scale(0.9) translateY(-20px); }
@@ -431,12 +453,21 @@
     /* ── Foundation-Sec Reasoning Panel ── */
     #reasoning-panel {
       position: fixed;
-      right: 320px;
-      top: 80px;
-      width: 400px;
-      z-index: 100;
+      right: 16px;
+      top: 76px;
+      bottom: 130px;
+      width: 380px;
+      z-index: 95;
       display: none;
       pointer-events: all;
+      overflow-y: auto;
+    }
+
+    #reasoning-panel::-webkit-scrollbar { width: 3px; }
+    #reasoning-panel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    #reasoning-panel .reasoning-card {
+      max-height: none;
     }
 
     .reasoning-card {
@@ -520,10 +551,18 @@
       margin-top: 6px;
     }
 
+    /* When the reasoning/autopsy panel is visible, anomaly toasts
+       compress to a slim strip so both are visible. */
+    body:has(#reasoning-panel[style*="display: block"]) #anomaly-overlay,
+    body:has(#reasoning-panel[style*="display:block"]) #anomaly-overlay {
+      max-height: 140px;
+      width: 280px;
+    }
+
     /* ── Live Demo Controls ── */
     #demo-controls {
       position: fixed;
-      bottom: 16px;
+      bottom: 130px;
       right: 16px;
       z-index: 60;
       display: flex;
@@ -668,14 +707,12 @@
 
   <!-- Trace Timeline -->
   <div id="timeline-panel" style="
-    grid-column: 1 / -1;
     pointer-events: all;
     background: rgba(8,14,30,0.7);
     border: 1px solid rgba(100,160,255,0.15);
     border-radius: 8px;
     margin: 4px 0 0 0;
-    overflow: hidden;
-    max-height: 80px;
+    overflow: auto;
   "></div>
 
   <!-- Bottom: AI Assistant -->
