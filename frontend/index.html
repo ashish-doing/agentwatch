@@ -55,7 +55,7 @@
       pointer-events: none;
       display: grid;
       grid-template-columns: 280px 1fr 300px;
-      grid-template-rows: 64px 48px 1fr 90px 110px 160px;
+      grid-template-rows: 64px 1fr 90px 110px 160px;
       gap: 0;
       padding: 12px;
     }
@@ -124,12 +124,12 @@
     /* ── Left Panel — Event Feed ── */
     #event-feed {
       grid-column: 1;
-      grid-row: 3;
+      grid-row: 2;
       pointer-events: all;
       background: var(--panel);
       border: 1px solid var(--border);
       border-radius: 12px;
-      margin: 8px 4px 8px 0;
+      margin: 60px 4px 8px 0;
       display: flex;
       flex-direction: column;
       overflow: hidden;
@@ -213,12 +213,12 @@
     /* ── Right Panel — Inspector ── */
     #inspector {
       grid-column: 3;
-      grid-row: 3;
+      grid-row: 2;
       pointer-events: all;
       background: var(--panel);
       border: 1px solid var(--border);
       border-radius: 12px;
-      margin: 8px 0 8px 4px;
+      margin: 60px 0 8px 4px;
       display: flex;
       flex-direction: column;
       overflow: hidden;
@@ -279,7 +279,7 @@
     /* ── Bottom — AI Assistant ── */
     #ai-assistant {
       grid-column: 1 / -1;
-      grid-row: 6;
+      grid-row: 5;
       pointer-events: all;
       background: var(--panel);
       border: 1px solid var(--border);
@@ -298,7 +298,7 @@
 
     #sparklines-row {
       grid-column: 1 / -1;
-      grid-row: 4;
+      grid-row: 3;
       pointer-events: all;
       display: flex;
       align-items: stretch;
@@ -315,7 +315,7 @@
 
     #timeline-panel {
       grid-column: 1 / -1;
-      grid-row: 5;
+      grid-row: 4;
       margin: 0 0 4px 0;
     }
 
@@ -591,21 +591,29 @@
 
     /* ── Live Demo Controls ── */
     #demo-controls {
-      grid-column: 1 / -1;
-      grid-row: 2;
-      position: relative;
-      z-index: 60;
+      position: fixed;
+      top: 96px;
+      left: 308px;
+      right: 16px;
+      z-index: 50;
       display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      justify-content: center;
-      gap: 4px;
+      flex-direction: row;
+      align-items: center;
+      gap: 12px;
       pointer-events: all;
       background: var(--panel);
       border: 1px solid var(--border);
       border-radius: 10px;
       padding: 8px 14px;
-      margin: 4px 0;
+      flex-wrap: wrap;
+    }
+
+    #demo-status {
+      font-size: 9px;
+      color: var(--text-dim);
+      flex: 1;
+      min-width: 200px;
+      text-align: right;
     }
 
     #demo-controls > div:first-child,
