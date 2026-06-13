@@ -8,6 +8,8 @@
  *   - The live event feed panel
  */
 
+import { updateHealthScore } from './health_score.js';
+import { initSparklines, pushSparklineEvent } from './sparklines.js';
 import { addOrUpdateNode } from './brain.js';
 import { showAnomalyAlert } from './alerts.js';
 
@@ -34,6 +36,7 @@ function connect() {
     connStatus.style.color = 'var(--green)';
     reconnectDelay = 1000;
     console.log('[AgentWatch] WebSocket connected');
+    initSparklines();
 
     // Heartbeat
     setInterval(() => {
@@ -86,6 +89,8 @@ function connect() {
 
 function handleEvent(event, showAlerts = true) {
   eventCount++;
+  updateHealthScore(event);
+  pushSparklineEvent(event);
 
   // Route to Three.js brain
   addOrUpdateNode(event);
