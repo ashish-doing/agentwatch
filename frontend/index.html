@@ -129,7 +129,7 @@
       background: var(--panel);
       border: 1px solid var(--border);
       border-radius: 12px;
-      margin: 60px 4px 8px 0;
+      margin: 8px 4px 8px 0;
       display: flex;
       flex-direction: column;
       overflow: hidden;
@@ -218,7 +218,7 @@
       background: var(--panel);
       border: 1px solid var(--border);
       border-radius: 12px;
-      margin: 60px 0 8px 4px;
+      margin: 8px 0 8px 4px;
       display: flex;
       flex-direction: column;
       overflow: hidden;
@@ -592,9 +592,10 @@
     /* ── Live Demo Controls ── */
     #demo-controls {
       position: fixed;
-      top: 96px;
-      left: 308px;
-      right: 16px;
+      top: 76px;
+      left: 16px;
+      width: 1290px;
+      max-width: calc(100% - 660px);
       z-index: 50;
       display: flex;
       flex-direction: row;
@@ -604,24 +605,27 @@
       background: var(--panel);
       border: 1px solid var(--border);
       border-radius: 10px;
-      padding: 8px 14px;
-      flex-wrap: wrap;
+      padding: 6px 14px;
+      height: 36px;
+      overflow: hidden;
     }
 
     #demo-status {
       font-size: 9px;
       color: var(--text-dim);
       flex: 1;
-      min-width: 200px;
+      min-width: 0;
       text-align: right;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
-    #demo-controls > div:first-child,
-    #demo-controls .demo-label {
+    #demo-controls > div:first-child {
       display: flex;
       align-items: center;
       gap: 10px;
-      width: 100%;
+      flex-shrink: 0;
     }
 
     #demo-controls .demo-label {
@@ -637,10 +641,10 @@
     }
 
     .demo-btn {
-      padding: 8px 14px;
-      border-radius: 8px;
+      padding: 5px 10px;
+      border-radius: 6px;
       font-family: var(--mono);
-      font-size: 10px;
+      font-size: 9px;
       letter-spacing: 1px;
       text-transform: uppercase;
       cursor: pointer;
@@ -648,6 +652,7 @@
       background: var(--panel);
       color: var(--text);
       transition: all 0.15s;
+      flex-shrink: 0;
     }
 
     .demo-btn:hover:not(:disabled) {
@@ -669,19 +674,11 @@
     .demo-btn.drift { border-color: rgba(255,136,0,0.3); }
     .demo-btn.drift:hover:not(:disabled) { border-color: var(--orange); color: var(--orange); }
 
-    #demo-status {
-      font-size: 9px;
-      color: var(--text-dim);
-      max-width: 100%;
-      text-align: left;
-      flex: none;
-      width: 100%;
-    }
 
     /* ── Connection status ── */
     #conn-status {
       position: fixed;
-      top: 16px;
+      bottom: 16px;
       right: 16px;
       font-size: 9px;
       letter-spacing: 2px;
