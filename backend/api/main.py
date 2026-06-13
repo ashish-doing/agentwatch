@@ -335,9 +335,14 @@ async def demo_trigger(req: DemoTriggerRequest):
 
 @app.get("/api/health")
 async def health():
+    try:
+        splunk_connected = await asyncio.wait_for(splunk.ping(), timeout=2.0)
+    except asyncio.TimeoutError:
+        splunk_connected = False
+
     return {
         "status": "ok",
-        "splunk_connected": await splunk.ping(),
+        "splunk_connected": splunk_connected,
         "buffer_size": len(event_buffer),
         "agent_connections": len(agent_connections),
         "browser_connections": len(browser_connections),
