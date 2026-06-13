@@ -12,7 +12,10 @@
  * but only fires AFTER agent run completes, never during active anomalies.
  */
 
-const API_URL = window.__API_URL || 'http://localhost:8001';
+const API_URL = window.__API_URL || (() => {
+  if (window.location.port === '3000') return 'http://localhost:8001';
+  return window.location.origin;
+})();
 
 const GRADE_COLOR = {
   A: '#00ff88',
