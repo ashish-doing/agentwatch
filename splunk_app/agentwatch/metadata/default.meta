@@ -1,0 +1,4 @@
+[default]
+access = read : [ * ], write : [ admin ]
+export = system
+version = 1.0.0
