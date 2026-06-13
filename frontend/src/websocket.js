@@ -12,8 +12,12 @@ import { updateHealthScore } from './health_score.js';
 import { initSparklines, pushSparklineEvent } from './sparklines.js';
 import { initTimeline, pushTimelineEvent } from './trace_timeline.js';
 import { checkRunComplete } from './autopsy_panel.js';
-import { addOrUpdateNode } from './brain.js';
+import { addOrUpdateNode, resetGraph } from './brain.js';
 import { showAnomalyAlert } from './alerts.js';
+
+// Expose reset to the global scope so the inline "Reset" button (non-module
+// script in index.html) can call it.
+window._resetBrain = resetGraph;
 
 // In production (served from the FastAPI backend itself, e.g. on
 // Railway), derive the WS URL from the current page's host so it works

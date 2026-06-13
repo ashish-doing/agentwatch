@@ -301,6 +301,32 @@ function applyForces() {
 
 const pulsingNodes = new Map();  // step_id → { start, duration }
 
+// ─────────────────────────────────────────────
+// Reset
+// ─────────────────────────────────────────────
+
+export function resetGraph() {
+  for (const node of nodes.values()) {
+    scene.remove(node.mesh);
+  }
+  for (const edge of edges) {
+    scene.remove(edge.line);
+  }
+  nodes.clear();
+  edges.length = 0;
+  pulsingNodes.clear();
+  lastStepId = null;
+  totalEvents = 0;
+  totalAnomalies = 0;
+  trustSum = 0;
+  agentIds.clear();
+
+  document.getElementById('stat-events').textContent = '0';
+  document.getElementById('stat-anomalies').textContent = '0';
+  document.getElementById('stat-trust').textContent = '1.00';
+  document.getElementById('stat-agents').textContent = '0';
+}
+
 export function pulseNode(step_id) {
   pulsingNodes.set(step_id, { start: Date.now(), duration: 1200 });
 }
