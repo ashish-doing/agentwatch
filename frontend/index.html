@@ -55,7 +55,7 @@
       pointer-events: none;
       display: grid;
       grid-template-columns: 280px 1fr 300px;
-      grid-template-rows: 64px 1fr 90px 110px 160px;
+      grid-template-rows: 64px 48px 1fr 90px 110px 160px;
       gap: 0;
       padding: 12px;
     }
@@ -124,7 +124,7 @@
     /* ── Left Panel — Event Feed ── */
     #event-feed {
       grid-column: 1;
-      grid-row: 2;
+      grid-row: 3;
       pointer-events: all;
       background: var(--panel);
       border: 1px solid var(--border);
@@ -213,7 +213,7 @@
     /* ── Right Panel — Inspector ── */
     #inspector {
       grid-column: 3;
-      grid-row: 2;
+      grid-row: 3;
       pointer-events: all;
       background: var(--panel);
       border: 1px solid var(--border);
@@ -279,7 +279,7 @@
     /* ── Bottom — AI Assistant ── */
     #ai-assistant {
       grid-column: 1 / -1;
-      grid-row: 5;
+      grid-row: 6;
       pointer-events: all;
       background: var(--panel);
       border: 1px solid var(--border);
@@ -298,7 +298,7 @@
 
     #sparklines-row {
       grid-column: 1 / -1;
-      grid-row: 3;
+      grid-row: 4;
       pointer-events: all;
       display: flex;
       align-items: stretch;
@@ -315,7 +315,7 @@
 
     #timeline-panel {
       grid-column: 1 / -1;
-      grid-row: 4;
+      grid-row: 5;
       margin: 0 0 4px 0;
     }
 
@@ -591,21 +591,21 @@
 
     /* ── Live Demo Controls ── */
     #demo-controls {
-      position: fixed;
-      top: 12px;
-      left: 320px;
-      right: 320px;
+      grid-column: 1 / -1;
+      grid-row: 2;
+      position: relative;
       z-index: 60;
       display: flex;
       flex-direction: column;
       align-items: flex-start;
+      justify-content: center;
       gap: 4px;
       pointer-events: all;
       background: var(--panel);
       border: 1px solid var(--border);
       border-radius: 10px;
       padding: 8px 14px;
-      max-width: none;
+      margin: 4px 0;
     }
 
     #demo-controls > div:first-child,
