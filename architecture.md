@@ -185,7 +185,7 @@ sequenceDiagram
 
 | Capability | Detail |
 |---|---|
-| **Splunk HEC** | `index=agentwatch`, `sourcetype=agentwatch:otel`, 1,269+ events indexed |
+| **Splunk HEC** | `index=agentwatch`, `sourcetype=agentwatch:otel`, 2,299+ events indexed |
 | **Splunk MCP Server** | All telemetry queryable via SPL from the UI |
 | **Splunk AI Toolkit** | Native `anomalydetection` command — 139-tool-call spike at 99.25% confidence |
 | **Splunk AI Assistant** | NL → SPL; e.g. "show me all loops in the last hour" → valid SPL |
@@ -215,10 +215,10 @@ sequenceDiagram
 
 | Metric | Value |
 |--------|-------|
-| Total events indexed | 1,269+ |
-| Anomalies detected | 180 |
-| Avg trust score | 59.7% |
-| Total tokens processed | 159,970 |
+| Total events indexed | 2,299+ |
+| Anomalies detected | 342 |
+| Avg trust score | 58.1% |
+| Total tokens processed | 279,993 |
 | Loop spike confidence | 99.25% |
 | Frameworks supported | 5 (LangGraph · CrewAI · OpenAI Agents · AutoGen · generic) |
 | Frontend pages | 3 (Brain · Ops · Topology) |
