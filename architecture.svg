@@ -1,211 +1,230 @@
-<svg width="720" height="960" viewBox="0 0 720 960" xmlns="http://www.w3.org/2000/svg">
-<title>AgentWatch system architecture</title>
+<svg width="720" height="980" viewBox="0 0 720 980" xmlns="http://www.w3.org/2000/svg">
+<title>AgentWatch — System Architecture</title>
 <defs>
   <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-    <path d="M2 2L8 5L2 8" fill="none" stroke="#4a6080" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M2 2L8 5L2 8" fill="none" stroke="#4a90d9" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
   </marker>
-  <filter id="glow">
-    <feGaussianBlur stdDeviation="2" result="blur"/>
-    <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-  </filter>
 </defs>
 
 <!-- BG -->
-<rect width="720" height="960" fill="#050810"/>
+<rect width="720" height="980" fill="#050810"/>
 
-<!-- ── AGENT LAYER ── -->
-<rect x="18" y="14" width="684" height="114" rx="10" fill="#0d0f1e" stroke="#4a3a8a" stroke-width="1"/>
-<text x="30" y="32" font-family="'Segoe UI',Arial,sans-serif" font-size="10" font-weight="700" fill="#7b6fd4" letter-spacing="2">AGENT LAYER</text>
+<!-- ══════════════════════════════════════════ -->
+<!-- AGENT LAYER -->
+<!-- ══════════════════════════════════════════ -->
+<rect x="16" y="12" width="688" height="118" rx="10" fill="#0d0b1e" stroke="#5a42cc" stroke-width="1.2"/>
+<!-- Layer label -->
+<text x="28" y="32" font-family="'Segoe UI',Arial,sans-serif" font-size="11" font-weight="700" fill="#8b7ae8" letter-spacing="3">AGENT LAYER</text>
 
-<rect x="30" y="40" width="156" height="76" rx="7" fill="#0a0b18" stroke="#4a3a8a" stroke-width="0.8"/>
-<text x="108" y="58" font-family="'Segoe UI',Arial,sans-serif" font-size="11" font-weight="700" fill="#9d8ff5" text-anchor="middle">AgentWatch SDK</text>
-<text x="108" y="73" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#5a4a9a" text-anchor="middle">@watch · watch_graph</text>
-<text x="108" y="86" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#5a4a9a" text-anchor="middle">emit_event · Context</text>
-<text x="108" y="99" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#5a4a9a" text-anchor="middle">new_trace()</text>
+<!-- Card 1 -->
+<rect x="28" y="40" width="156" height="78" rx="7" fill="#0a081c" stroke="#6a52dc" stroke-width="0.8"/>
+<text x="106" y="60" font-family="'Segoe UI',Arial,sans-serif" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">AgentWatch SDK</text>
+<text x="106" y="76" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#a090e8" text-anchor="middle">@watch · watch_graph</text>
+<text x="106" y="89" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#a090e8" text-anchor="middle">emit_event · Context</text>
+<text x="106" y="102" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#a090e8" text-anchor="middle">new_trace()</text>
 
-<rect x="200" y="40" width="156" height="76" rx="7" fill="#0a0b18" stroke="#4a3a8a" stroke-width="0.8"/>
-<text x="278" y="58" font-family="'Segoe UI',Arial,sans-serif" font-size="11" font-weight="700" fill="#9d8ff5" text-anchor="middle">Framework Hooks</text>
-<text x="278" y="73" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#5a4a9a" text-anchor="middle">LangGraph · CrewAI</text>
-<text x="278" y="86" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#5a4a9a" text-anchor="middle">OpenAI Agents · AutoGen</text>
-<text x="278" y="99" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#5a4a9a" text-anchor="middle">@watch_tool / @watch_llm</text>
+<!-- Card 2 -->
+<rect x="198" y="40" width="156" height="78" rx="7" fill="#0a081c" stroke="#6a52dc" stroke-width="0.8"/>
+<text x="276" y="60" font-family="'Segoe UI',Arial,sans-serif" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">Framework Hooks</text>
+<text x="276" y="76" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#a090e8" text-anchor="middle">LangGraph · CrewAI</text>
+<text x="276" y="89" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#a090e8" text-anchor="middle">OpenAI Agents · AutoGen</text>
+<text x="276" y="102" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#a090e8" text-anchor="middle">@watch_tool / @watch_llm</text>
 
-<rect x="370" y="40" width="156" height="76" rx="7" fill="#0a0b18" stroke="#4a3a8a" stroke-width="0.8"/>
-<text x="448" y="58" font-family="'Segoe UI',Arial,sans-serif" font-size="11" font-weight="700" fill="#9d8ff5" text-anchor="middle">OpenTelemetry</text>
-<text x="448" y="73" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#5a4a9a" text-anchor="middle">traces · spans</text>
-<text x="448" y="86" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#5a4a9a" text-anchor="middle">trust scores · tokens</text>
-<text x="448" y="99" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#5a4a9a" text-anchor="middle">latency · step IDs</text>
+<!-- Card 3 -->
+<rect x="368" y="40" width="156" height="78" rx="7" fill="#0a081c" stroke="#6a52dc" stroke-width="0.8"/>
+<text x="446" y="60" font-family="'Segoe UI',Arial,sans-serif" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">OpenTelemetry</text>
+<text x="446" y="76" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#a090e8" text-anchor="middle">traces · spans · trust</text>
+<text x="446" y="89" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#a090e8" text-anchor="middle">tokens · latency</text>
+<text x="446" y="102" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#a090e8" text-anchor="middle">step IDs · agent IDs</text>
 
-<rect x="540" y="40" width="156" height="76" rx="7" fill="#0a0b18" stroke="#4a3a8a" stroke-width="0.8"/>
-<text x="618" y="58" font-family="'Segoe UI',Arial,sans-serif" font-size="11" font-weight="700" fill="#9d8ff5" text-anchor="middle">Demo Agent</text>
-<text x="618" y="73" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#5a4a9a" text-anchor="middle">normal · loop</text>
-<text x="618" y="86" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#5a4a9a" text-anchor="middle">hallucinate · drift</text>
-<text x="618" y="99" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#5a4a9a" text-anchor="middle">4 failure modes</text>
+<!-- Card 4 -->
+<rect x="538" y="40" width="162" height="78" rx="7" fill="#0a081c" stroke="#6a52dc" stroke-width="0.8"/>
+<text x="619" y="60" font-family="'Segoe UI',Arial,sans-serif" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">Demo Agent</text>
+<text x="619" y="76" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#a090e8" text-anchor="middle">normal · loop</text>
+<text x="619" y="89" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#a090e8" text-anchor="middle">hallucinate · drift</text>
+<text x="619" y="102" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#a090e8" text-anchor="middle">4 failure modes</text>
 
-<!-- Arrow 1 -->
-<line x1="360" y1="128" x2="360" y2="158" stroke="#2a3a5a" stroke-width="1" marker-end="url(#arr)"/>
-<text x="372" y="148" font-family="'Segoe UI',Arial,sans-serif" font-size="8" fill="#3a5070">events</text>
+<!-- Arrow A1 -->
+<line x1="360" y1="130" x2="360" y2="162" stroke="#4a90d9" stroke-width="1" marker-end="url(#arr)"/>
+<text x="372" y="150" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#6a90b9">events</text>
 
-<!-- ── BACKEND LAYER ── -->
-<rect x="18" y="162" width="684" height="186" rx="10" fill="#0a130d" stroke="#1a5a3a" stroke-width="1"/>
-<text x="30" y="180" font-family="'Segoe UI',Arial,sans-serif" font-size="10" font-weight="700" fill="#2a9a6a" letter-spacing="2">BACKEND LAYER</text>
+<!-- ══════════════════════════════════════════ -->
+<!-- BACKEND LAYER -->
+<!-- ══════════════════════════════════════════ -->
+<rect x="16" y="165" width="688" height="192" rx="10" fill="#08130d" stroke="#1e7a4a" stroke-width="1.2"/>
+<text x="28" y="185" font-family="'Segoe UI',Arial,sans-serif" font-size="11" font-weight="700" fill="#2eca7a" letter-spacing="3">BACKEND LAYER</text>
 
-<rect x="30" y="188" width="156" height="148" rx="7" fill="#080f0a" stroke="#1a5a3a" stroke-width="0.8"/>
-<text x="108" y="206" font-family="'Segoe UI',Arial,sans-serif" font-size="11" font-weight="700" fill="#2ac88a" text-anchor="middle">FastAPI</text>
-<text x="108" y="221" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#1a7a5a" text-anchor="middle">/api/explain  /api/query</text>
-<text x="108" y="234" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#1a7a5a" text-anchor="middle">/api/autopsy  /api/history</text>
-<text x="108" y="247" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#1a7a5a" text-anchor="middle">/api/config</text>
-<text x="108" y="260" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#1a7a5a" text-anchor="middle">/api/export/incident</text>
-<text x="108" y="273" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#1a7a5a" text-anchor="middle">/api/demo/trigger</text>
-<text x="108" y="286" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#1a7a5a" text-anchor="middle">serves / /ops /topology</text>
-<text x="108" y="299" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#1a7a5a" text-anchor="middle">Slack webhook · PDF</text>
-<text x="108" y="312" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#1a7a5a" text-anchor="middle">14 endpoints total</text>
+<!-- Card 1 -->
+<rect x="28" y="193" width="156" height="152" rx="7" fill="#060f09" stroke="#1e7a4a" stroke-width="0.8"/>
+<text x="106" y="213" font-family="'Segoe UI',Arial,sans-serif" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">FastAPI</text>
+<text x="106" y="229" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#60c890" text-anchor="middle">/api/explain  /api/query</text>
+<text x="106" y="242" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#60c890" text-anchor="middle">/api/autopsy  /api/history</text>
+<text x="106" y="255" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#60c890" text-anchor="middle">/api/config</text>
+<text x="106" y="268" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#60c890" text-anchor="middle">/api/export/incident</text>
+<text x="106" y="281" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#60c890" text-anchor="middle">/api/demo/trigger</text>
+<text x="106" y="294" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#60c890" text-anchor="middle">serves / /ops /topology</text>
+<text x="106" y="307" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#60c890" text-anchor="middle">Slack webhook · PDF</text>
+<text x="106" y="320" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#3a9a6a" text-anchor="middle">14 endpoints total</text>
 
-<rect x="200" y="188" width="156" height="148" rx="7" fill="#080f0a" stroke="#1a5a3a" stroke-width="0.8"/>
-<text x="278" y="206" font-family="'Segoe UI',Arial,sans-serif" font-size="11" font-weight="700" fill="#2ac88a" text-anchor="middle">AnomalyDetector</text>
-<text x="278" y="221" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#1a7a5a" text-anchor="middle">loop ≥5 calls</text>
-<text x="278" y="234" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#1a7a5a" text-anchor="middle">token spike ≥3,000</text>
-<text x="278" y="247" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#1a7a5a" text-anchor="middle">latency drift ≥3,000ms</text>
-<text x="278" y="260" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#1a7a5a" text-anchor="middle">error burst ≥3</text>
-<text x="278" y="273" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#1a7a5a" text-anchor="middle">trust collapse ≤0.3</text>
-<text x="278" y="286" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#1a7a5a" text-anchor="middle">configurable via UI</text>
-<text x="278" y="299" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#1a7a5a" text-anchor="middle">CRITICAL → Slack</text>
+<!-- Card 2 -->
+<rect x="198" y="193" width="156" height="152" rx="7" fill="#060f09" stroke="#1e7a4a" stroke-width="0.8"/>
+<text x="276" y="213" font-family="'Segoe UI',Arial,sans-serif" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">AnomalyDetector</text>
+<text x="276" y="229" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#60c890" text-anchor="middle">loop ≥5 calls</text>
+<text x="276" y="242" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#60c890" text-anchor="middle">token spike ≥3,000</text>
+<text x="276" y="255" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#60c890" text-anchor="middle">latency drift ≥3,000ms</text>
+<text x="276" y="268" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#60c890" text-anchor="middle">error burst ≥3</text>
+<text x="276" y="281" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#60c890" text-anchor="middle">trust collapse ≤0.3</text>
+<text x="276" y="294" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#60c890" text-anchor="middle">configurable via UI</text>
+<text x="276" y="307" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#60c890" text-anchor="middle">CRITICAL → Slack</text>
 
-<rect x="370" y="188" width="156" height="148" rx="7" fill="#080f0a" stroke="#1a5a3a" stroke-width="0.8"/>
-<text x="448" y="206" font-family="'Segoe UI',Arial,sans-serif" font-size="11" font-weight="700" fill="#2ac88a" text-anchor="middle">WebSocket</text>
-<text x="448" y="221" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#1a7a5a" text-anchor="middle">/ws/agent-stream</text>
-<text x="448" y="234" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#1a7a5a" text-anchor="middle">/ws/browser</text>
-<text x="448" y="247" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#1a7a5a" text-anchor="middle">500-event ring buffer</text>
-<text x="448" y="260" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#1a7a5a" text-anchor="middle">100-event replay</text>
-<text x="448" y="273" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#1a7a5a" text-anchor="middle">fan-out broadcast</text>
-<text x="448" y="286" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#1a7a5a" text-anchor="middle">auto-reconnect</text>
+<!-- Card 3 -->
+<rect x="368" y="193" width="156" height="152" rx="7" fill="#060f09" stroke="#1e7a4a" stroke-width="0.8"/>
+<text x="446" y="213" font-family="'Segoe UI',Arial,sans-serif" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">WebSocket</text>
+<text x="446" y="229" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#60c890" text-anchor="middle">/ws/agent-stream</text>
+<text x="446" y="242" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#60c890" text-anchor="middle">/ws/browser</text>
+<text x="446" y="255" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#60c890" text-anchor="middle">500-event ring buffer</text>
+<text x="446" y="268" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#60c890" text-anchor="middle">100-event replay</text>
+<text x="446" y="281" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#60c890" text-anchor="middle">fan-out broadcast</text>
+<text x="446" y="294" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#60c890" text-anchor="middle">auto-reconnect</text>
 
-<rect x="540" y="188" width="156" height="148" rx="7" fill="#080f0a" stroke="#1a5a3a" stroke-width="0.8"/>
-<text x="618" y="206" font-family="'Segoe UI',Arial,sans-serif" font-size="11" font-weight="700" fill="#2ac88a" text-anchor="middle">SplunkClient</text>
-<text x="618" y="221" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#1a7a5a" text-anchor="middle">HEC indexing</text>
-<text x="618" y="234" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#1a7a5a" text-anchor="middle">SPL search REST</text>
-<text x="618" y="247" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#1a7a5a" text-anchor="middle">AI Assistant NL→SPL</text>
-<text x="618" y="260" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#1a7a5a" text-anchor="middle">Foundation-Sec client</text>
-<text x="618" y="273" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#1a7a5a" text-anchor="middle">Autopsy A–F</text>
-<text x="618" y="286" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#1a7a5a" text-anchor="middle">template fallback</text>
+<!-- Card 4 -->
+<rect x="538" y="193" width="162" height="152" rx="7" fill="#060f09" stroke="#1e7a4a" stroke-width="0.8"/>
+<text x="619" y="213" font-family="'Segoe UI',Arial,sans-serif" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">SplunkClient</text>
+<text x="619" y="229" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#60c890" text-anchor="middle">HEC indexing</text>
+<text x="619" y="242" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#60c890" text-anchor="middle">SPL search REST</text>
+<text x="619" y="255" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#60c890" text-anchor="middle">AI Assistant NL→SPL</text>
+<text x="619" y="268" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#60c890" text-anchor="middle">Foundation-Sec client</text>
+<text x="619" y="281" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#60c890" text-anchor="middle">Autopsy A–F</text>
+<text x="619" y="294" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#60c890" text-anchor="middle">template fallback</text>
 
-<!-- Arrow 2a -->
-<line x1="618" y1="348" x2="618" y2="380" stroke="#2a3a5a" stroke-width="1" marker-end="url(#arr)"/>
-<text x="630" y="368" font-family="'Segoe UI',Arial,sans-serif" font-size="8" fill="#3a5070">HEC POST</text>
-<line x1="278" y1="348" x2="278" y2="380" stroke="#2a3a5a" stroke-width="1" marker-end="url(#arr)"/>
-<text x="290" y="368" font-family="'Segoe UI',Arial,sans-serif" font-size="8" fill="#3a5070">anomaly</text>
+<!-- Arrows A2 -->
+<line x1="619" y1="357" x2="619" y2="392" stroke="#4a90d9" stroke-width="1" marker-end="url(#arr)"/>
+<text x="626" y="378" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#6a90b9">HEC POST</text>
+<line x1="276" y1="357" x2="276" y2="392" stroke="#4a90d9" stroke-width="1" marker-end="url(#arr)"/>
+<text x="283" y="378" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#6a90b9">anomaly</text>
 
-<!-- ── SPLUNK LAYER ── -->
-<rect x="18" y="384" width="684" height="198" rx="10" fill="#130a06" stroke="#7a3010" stroke-width="1"/>
-<text x="30" y="402" font-family="'Segoe UI',Arial,sans-serif" font-size="10" font-weight="700" fill="#c85020" letter-spacing="2">SPLUNK PLATFORM</text>
+<!-- ══════════════════════════════════════════ -->
+<!-- SPLUNK LAYER -->
+<!-- ══════════════════════════════════════════ -->
+<rect x="16" y="395" width="688" height="196" rx="10" fill="#130c06" stroke="#aa4010" stroke-width="1.2"/>
+<text x="28" y="415" font-family="'Segoe UI',Arial,sans-serif" font-size="11" font-weight="700" fill="#e06020" letter-spacing="3">SPLUNK PLATFORM</text>
 
-<rect x="30" y="410" width="156" height="160" rx="7" fill="#0f0804" stroke="#7a3010" stroke-width="0.8"/>
-<text x="108" y="428" font-family="'Segoe UI',Arial,sans-serif" font-size="11" font-weight="700" fill="#e06030" text-anchor="middle">Splunk HEC</text>
-<text x="108" y="443" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#8a4020" text-anchor="middle">index: agentwatch</text>
-<text x="108" y="456" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#8a4020" text-anchor="middle">agentwatch:otel</text>
-<text x="108" y="469" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#8a4020" text-anchor="middle">1,269+ events</text>
-<text x="108" y="482" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#8a4020" text-anchor="middle">props.conf</text>
-<text x="108" y="495" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#8a4020" text-anchor="middle">transforms.conf</text>
-<text x="108" y="508" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#8a4020" text-anchor="middle">savedsearches.conf</text>
-<text x="108" y="521" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#8a4020" text-anchor="middle">Splunkbase app pkg</text>
-<text x="108" y="534" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#8a4020" text-anchor="middle">splunk_app/</text>
+<!-- Card 1 -->
+<rect x="28" y="423" width="156" height="156" rx="7" fill="#0e0804" stroke="#aa4010" stroke-width="0.8"/>
+<text x="106" y="443" font-family="'Segoe UI',Arial,sans-serif" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">Splunk HEC</text>
+<text x="106" y="459" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#e08050" text-anchor="middle">index: agentwatch</text>
+<text x="106" y="472" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#e08050" text-anchor="middle">agentwatch:otel</text>
+<text x="106" y="485" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#e08050" text-anchor="middle">1,269+ events</text>
+<text x="106" y="498" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#e08050" text-anchor="middle">props.conf</text>
+<text x="106" y="511" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#e08050" text-anchor="middle">transforms.conf</text>
+<text x="106" y="524" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#e08050" text-anchor="middle">savedsearches.conf</text>
+<text x="106" y="537" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#e08050" text-anchor="middle">splunk_app/ pkg</text>
+<text x="106" y="550" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#aa5030" text-anchor="middle">Splunkbase-ready</text>
 
-<rect x="200" y="410" width="156" height="160" rx="7" fill="#0f0804" stroke="#7a3010" stroke-width="0.8"/>
-<text x="278" y="428" font-family="'Segoe UI',Arial,sans-serif" font-size="11" font-weight="700" fill="#e06030" text-anchor="middle">AI Toolkit</text>
-<text x="278" y="443" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#8a4020" text-anchor="middle">anomalydetection cmd</text>
-<text x="278" y="456" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#8a4020" text-anchor="middle">tool-call time-series</text>
-<text x="278" y="469" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#8a4020" text-anchor="middle">99.25% confidence</text>
-<text x="278" y="482" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#8a4020" text-anchor="middle">139-call spike caught</text>
-<text x="278" y="495" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#8a4020" text-anchor="middle">180 anomalies total</text>
-<text x="278" y="508" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#8a4020" text-anchor="middle">Cisco Deep Time Series</text>
+<!-- Card 2 -->
+<rect x="198" y="423" width="156" height="156" rx="7" fill="#0e0804" stroke="#aa4010" stroke-width="0.8"/>
+<text x="276" y="443" font-family="'Segoe UI',Arial,sans-serif" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">AI Toolkit</text>
+<text x="276" y="459" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#e08050" text-anchor="middle">anomalydetection cmd</text>
+<text x="276" y="472" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#e08050" text-anchor="middle">tool-call time-series</text>
+<text x="276" y="485" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#e08050" text-anchor="middle">99.25% confidence</text>
+<text x="276" y="498" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#e08050" text-anchor="middle">139-call spike caught</text>
+<text x="276" y="511" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#e08050" text-anchor="middle">180 anomalies total</text>
+<text x="276" y="524" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#e08050" text-anchor="middle">Cisco Deep Time Series</text>
 
-<rect x="370" y="410" width="156" height="160" rx="7" fill="#0f0804" stroke="#7a3010" stroke-width="0.8"/>
-<text x="448" y="428" font-family="'Segoe UI',Arial,sans-serif" font-size="10" font-weight="700" fill="#e06030" text-anchor="middle">Foundation-Sec-1.1-8B</text>
-<text x="448" y="443" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#8a4020" text-anchor="middle">Splunk hosted model</text>
-<text x="448" y="456" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#8a4020" text-anchor="middle">Explain This button</text>
-<text x="448" y="469" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#8a4020" text-anchor="middle">Agent Autopsy A–F</text>
-<text x="448" y="482" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#8a4020" text-anchor="middle">root cause + fix</text>
-<text x="448" y="495" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#8a4020" text-anchor="middle">cost estimate</text>
-<text x="448" y="508" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#8a4020" text-anchor="middle">PDF incident export</text>
-<text x="448" y="521" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#8a4020" text-anchor="middle">rule-based fallback</text>
+<!-- Card 3 -->
+<rect x="368" y="423" width="156" height="156" rx="7" fill="#0e0804" stroke="#aa4010" stroke-width="0.8"/>
+<text x="446" y="443" font-family="'Segoe UI',Arial,sans-serif" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">Foundation-Sec-1.1-8B</text>
+<text x="446" y="459" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#e08050" text-anchor="middle">Splunk hosted model</text>
+<text x="446" y="472" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#e08050" text-anchor="middle">Explain This button</text>
+<text x="446" y="485" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#e08050" text-anchor="middle">Agent Autopsy A–F</text>
+<text x="446" y="498" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#e08050" text-anchor="middle">root cause + fix</text>
+<text x="446" y="511" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#e08050" text-anchor="middle">cost estimate</text>
+<text x="446" y="524" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#e08050" text-anchor="middle">PDF incident export</text>
+<text x="446" y="537" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#e08050" text-anchor="middle">rule-based fallback</text>
 
-<rect x="540" y="410" width="156" height="160" rx="7" fill="#0f0804" stroke="#7a3010" stroke-width="0.8"/>
-<text x="618" y="428" font-family="'Segoe UI',Arial,sans-serif" font-size="11" font-weight="700" fill="#e06030" text-anchor="middle">MCP + AI Assistant</text>
-<text x="618" y="443" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#8a4020" text-anchor="middle">MCP Server</text>
-<text x="618" y="456" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#8a4020" text-anchor="middle">all telemetry in SPL</text>
-<text x="618" y="469" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#8a4020" text-anchor="middle">AI Assistant NL→SPL</text>
-<text x="618" y="482" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#8a4020" text-anchor="middle">show loops last hour</text>
-<text x="618" y="495" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#8a4020" text-anchor="middle">→ valid SPL query</text>
-<text x="618" y="508" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#8a4020" text-anchor="middle">8-panel dashboard</text>
+<!-- Card 4 -->
+<rect x="538" y="423" width="162" height="156" rx="7" fill="#0e0804" stroke="#aa4010" stroke-width="0.8"/>
+<text x="619" y="443" font-family="'Segoe UI',Arial,sans-serif" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">MCP + AI Assistant</text>
+<text x="619" y="459" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#e08050" text-anchor="middle">MCP Server</text>
+<text x="619" y="472" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#e08050" text-anchor="middle">all telemetry in SPL</text>
+<text x="619" y="485" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#e08050" text-anchor="middle">AI Assistant NL→SPL</text>
+<text x="619" y="498" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#e08050" text-anchor="middle">show loops last hour</text>
+<text x="619" y="511" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#e08050" text-anchor="middle">→ valid SPL query</text>
+<text x="619" y="524" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#e08050" text-anchor="middle">8-panel dashboard</text>
 
-<!-- Arrow 3 -->
-<line x1="360" y1="582" x2="360" y2="612" stroke="#2a3a5a" stroke-width="1" marker-end="url(#arr)"/>
-<text x="372" y="601" font-family="'Segoe UI',Arial,sans-serif" font-size="8" fill="#3a5070">WS events</text>
+<!-- Arrow A3 -->
+<line x1="360" y1="591" x2="360" y2="624" stroke="#4a90d9" stroke-width="1" marker-end="url(#arr)"/>
+<text x="372" y="612" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#6a90b9">WS events</text>
 
-<!-- ── FRONTEND LAYER ── -->
-<rect x="18" y="616" width="684" height="288" rx="10" fill="#080d18" stroke="#1a3a7a" stroke-width="1"/>
-<text x="30" y="634" font-family="'Segoe UI',Arial,sans-serif" font-size="10" font-weight="700" fill="#2a6acc" letter-spacing="2">FRONTEND LAYER</text>
+<!-- ══════════════════════════════════════════ -->
+<!-- FRONTEND LAYER -->
+<!-- ══════════════════════════════════════════ -->
+<rect x="16" y="627" width="688" height="290" rx="10" fill="#060c18" stroke="#1a4a9a" stroke-width="1.2"/>
+<text x="28" y="647" font-family="'Segoe UI',Arial,sans-serif" font-size="11" font-weight="700" fill="#4a8aee" letter-spacing="3">FRONTEND LAYER</text>
 
-<rect x="30" y="642" width="156" height="154" rx="7" fill="#060a14" stroke="#1a3a7a" stroke-width="0.8"/>
-<text x="108" y="660" font-family="'Segoe UI',Arial,sans-serif" font-size="11" font-weight="700" fill="#4a8aee" text-anchor="middle">Live Brain  /</text>
-<text x="108" y="675" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">Three.js r128</text>
-<text x="108" y="688" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">force-directed graph</text>
-<text x="108" y="701" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">trust-score colors</text>
-<text x="108" y="714" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">anomaly glow + ring</text>
-<text x="108" y="727" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">click → inspector</text>
-<text x="108" y="740" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">⚙ alert rules config</text>
-<text x="108" y="753" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">brain.js</text>
-<text x="108" y="766" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">alerts.js · assistant.js</text>
-<text x="108" y="779" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">sparklines · timeline</text>
+<!-- Card 1 -->
+<rect x="28" y="655" width="156" height="158" rx="7" fill="#040810" stroke="#1a4a9a" stroke-width="0.8"/>
+<text x="106" y="675" font-family="'Segoe UI',Arial,sans-serif" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">Live Brain  /</text>
+<text x="106" y="691" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#5a90ee" text-anchor="middle">Three.js r128</text>
+<text x="106" y="704" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#5a90ee" text-anchor="middle">force-directed graph</text>
+<text x="106" y="717" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#5a90ee" text-anchor="middle">trust-score colors</text>
+<text x="106" y="730" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#5a90ee" text-anchor="middle">anomaly glow + ring</text>
+<text x="106" y="743" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#5a90ee" text-anchor="middle">click → inspector</text>
+<text x="106" y="756" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#5a90ee" text-anchor="middle">⚙ alert rules config</text>
+<text x="106" y="769" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#5a90ee" text-anchor="middle">brain.js · alerts.js</text>
+<text x="106" y="782" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#3a7aca" text-anchor="middle">sparklines · timeline</text>
 
-<rect x="200" y="642" width="156" height="154" rx="7" fill="#060a14" stroke="#1a3a7a" stroke-width="0.8"/>
-<text x="278" y="660" font-family="'Segoe UI',Arial,sans-serif" font-size="11" font-weight="700" fill="#4a8aee" text-anchor="middle">Agent Ops  /ops</text>
-<text x="278" y="675" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">CRM dashboard</text>
-<text x="278" y="688" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">run history table</text>
-<text x="278" y="701" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">trust trend chart</text>
-<text x="278" y="714" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">anomaly doughnut</text>
-<text x="278" y="727" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">SLO manager</text>
-<text x="278" y="740" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">cost tracker</text>
-<text x="278" y="753" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">live activity feed</text>
-<text x="278" y="766" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">Chart.js 4.4</text>
-<text x="278" y="779" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">ops.html</text>
+<!-- Card 2 -->
+<rect x="198" y="655" width="156" height="158" rx="7" fill="#040810" stroke="#1a4a9a" stroke-width="0.8"/>
+<text x="276" y="675" font-family="'Segoe UI',Arial,sans-serif" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">Agent Ops  /ops</text>
+<text x="276" y="691" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#5a90ee" text-anchor="middle">CRM dashboard</text>
+<text x="276" y="704" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#5a90ee" text-anchor="middle">run history table</text>
+<text x="276" y="717" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#5a90ee" text-anchor="middle">trust trend chart</text>
+<text x="276" y="730" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#5a90ee" text-anchor="middle">anomaly doughnut</text>
+<text x="276" y="743" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#5a90ee" text-anchor="middle">SLO manager</text>
+<text x="276" y="756" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#5a90ee" text-anchor="middle">cost tracker</text>
+<text x="276" y="769" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#5a90ee" text-anchor="middle">Chart.js 4.4</text>
+<text x="276" y="782" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#3a7aca" text-anchor="middle">ops.html</text>
 
-<rect x="370" y="642" width="156" height="154" rx="7" fill="#060a14" stroke="#1a3a7a" stroke-width="0.8"/>
-<text x="448" y="660" font-family="'Segoe UI',Arial,sans-serif" font-size="11" font-weight="700" fill="#4a8aee" text-anchor="middle">Topology  /topology</text>
-<text x="448" y="675" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">multi-agent graph</text>
-<text x="448" y="688" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">Three.js r128</text>
-<text x="448" y="701" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">force-directed layout</text>
-<text x="448" y="714" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">edge particles</text>
-<text x="448" y="727" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">orbit camera</text>
-<text x="448" y="740" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">node inspector</text>
-<text x="448" y="753" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">agent hub nodes</text>
-<text x="448" y="766" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">topology.html</text>
+<!-- Card 3 -->
+<rect x="368" y="655" width="156" height="158" rx="7" fill="#040810" stroke="#1a4a9a" stroke-width="0.8"/>
+<text x="446" y="675" font-family="'Segoe UI',Arial,sans-serif" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">Topology  /topology</text>
+<text x="446" y="691" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#5a90ee" text-anchor="middle">multi-agent graph</text>
+<text x="446" y="704" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#5a90ee" text-anchor="middle">Three.js r128</text>
+<text x="446" y="717" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#5a90ee" text-anchor="middle">force-directed layout</text>
+<text x="446" y="730" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#5a90ee" text-anchor="middle">edge particles</text>
+<text x="446" y="743" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#5a90ee" text-anchor="middle">orbit camera</text>
+<text x="446" y="756" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#5a90ee" text-anchor="middle">node inspector</text>
+<text x="446" y="769" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#5a90ee" text-anchor="middle">agent hub nodes</text>
+<text x="446" y="782" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#3a7aca" text-anchor="middle">topology.html</text>
 
-<rect x="540" y="642" width="156" height="154" rx="7" fill="#060a14" stroke="#1a3a7a" stroke-width="0.8"/>
-<text x="618" y="660" font-family="'Segoe UI',Arial,sans-serif" font-size="11" font-weight="700" fill="#4a8aee" text-anchor="middle">UI Modules</text>
-<text x="618" y="675" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">alert rules configurator</text>
-<text x="618" y="688" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">incident PDF export</text>
-<text x="618" y="701" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">AI Assistant panel</text>
-<text x="618" y="714" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">health score</text>
-<text x="618" y="727" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">sparklines</text>
-<text x="618" y="740" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">trace timeline</text>
-<text x="618" y="753" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">autopsy panel</text>
+<!-- Card 4 -->
+<rect x="538" y="655" width="162" height="158" rx="7" fill="#040810" stroke="#1a4a9a" stroke-width="0.8"/>
+<text x="619" y="675" font-family="'Segoe UI',Arial,sans-serif" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">UI Modules</text>
+<text x="619" y="691" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#5a90ee" text-anchor="middle">alert rules config</text>
+<text x="619" y="704" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#5a90ee" text-anchor="middle">incident PDF export</text>
+<text x="619" y="717" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#5a90ee" text-anchor="middle">AI Assistant panel</text>
+<text x="619" y="730" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#5a90ee" text-anchor="middle">health score</text>
+<text x="619" y="743" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#5a90ee" text-anchor="middle">sparklines</text>
+<text x="619" y="756" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#5a90ee" text-anchor="middle">trace timeline</text>
+<text x="619" y="769" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#5a90ee" text-anchor="middle">autopsy panel</text>
 
-<!-- Bottom row -->
-<rect x="30" y="812" width="320" height="62" rx="7" fill="#060a14" stroke="#1a3a7a" stroke-width="0.8"/>
-<text x="190" y="832" font-family="'Segoe UI',Arial,sans-serif" font-size="11" font-weight="700" fill="#4a8aee" text-anchor="middle">Splunk Cloud Native App</text>
-<text x="190" y="847" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">splunk_app/ · app.conf · indexes.conf · inputs.conf</text>
-<text x="190" y="860" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">props.conf · transforms.conf · savedsearches.conf</text>
+<!-- Bottom cards -->
+<rect x="28" y="825" width="322" height="66" rx="7" fill="#040810" stroke="#1a4a9a" stroke-width="0.8"/>
+<text x="189" y="845" font-family="'Segoe UI',Arial,sans-serif" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">Splunk Cloud Native App</text>
+<text x="189" y="861" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#5a90ee" text-anchor="middle">splunk_app/ · app.conf · indexes.conf · inputs.conf</text>
+<text x="189" y="874" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#5a90ee" text-anchor="middle">props.conf · transforms.conf · savedsearches.conf</text>
 
-<rect x="370" y="812" width="326" height="62" rx="7" fill="#060a14" stroke="#1a3a7a" stroke-width="0.8"/>
-<text x="533" y="832" font-family="'Segoe UI',Arial,sans-serif" font-size="11" font-weight="700" fill="#4a8aee" text-anchor="middle">Deploy</text>
-<text x="533" y="847" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">Railway (FastAPI + frontend) · GitHub Pages (landing)</text>
-<text x="533" y="860" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">MIT License · Python 3.10 · open source</text>
+<rect x="364" y="825" width="340" height="66" rx="7" fill="#040810" stroke="#1a4a9a" stroke-width="0.8"/>
+<text x="534" y="845" font-family="'Segoe UI',Arial,sans-serif" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">Deploy</text>
+<text x="534" y="861" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#5a90ee" text-anchor="middle">Railway (FastAPI + frontend) · GitHub Pages (landing)</text>
+<text x="534" y="874" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#5a90ee" text-anchor="middle">MIT License · Python 3.10 · open source</text>
 
 <!-- Stats strip -->
-<rect x="18" y="890" width="684" height="22" rx="5" fill="#0a0d18" stroke="#1a2a4a" stroke-width="0.5"/>
-<text x="360" y="905" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#3a5a8a" text-anchor="middle">1,269+ events · 180 anomalies · 59.7% avg trust · 159,970 tokens · 99.25% loop confidence · 5 frameworks · 3 pages · 14 endpoints</text>
+<rect x="16" y="930" width="688" height="22" rx="5" fill="#08090f" stroke="#1a2a4a" stroke-width="0.5"/>
+<text x="360" y="945" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#4a6a9a" text-anchor="middle">1,269+ events · 180 anomalies · 59.7% avg trust · 159,970 tokens · 99.25% loop confidence · 5 frameworks · 3 pages · 14 endpoints</text>
 
-<!-- Track badge -->
-<rect x="18" y="928" width="684" height="22" rx="5" fill="#0a0810" stroke="#3a1a6a" stroke-width="0.5"/>
-<text x="360" y="943" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#6a3a9a" text-anchor="middle">Track: Platform &amp; Developer Experience  ·  Splunk Agentic Ops Hackathon 2026  ·  $20,000 in prizes</text>
+<!-- Track strip -->
+<rect x="16" y="956" width="688" height="20" rx="5" fill="#0a0814" stroke="#2a1a5a" stroke-width="0.5"/>
+<text x="360" y="970" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#6a4aaa" text-anchor="middle">Track: Platform &amp; Developer Experience  ·  Splunk Agentic Ops Hackathon 2026  ·  $20,000 in prizes</text>
 </svg>
