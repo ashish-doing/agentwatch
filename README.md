@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://readme-typing-svg.demolab.com?font=Syne&weight=800&size=24&duration=3000&pause=1000&color=00E5FF&center=true&vCenter=true&width=1000&lines=AgentWatch+%E2%80%94+AI+Agent+Observability+for+Splunk;Real-time+anomaly+detection+for+AI+agents;Loop+detected+%E2%80%94+search_tool+called+23%C3%97+in+4s;Foundation-Sec+root+cause+in+plain+English;Splunk+MCP+%C2%B7+AI+Toolkit+%C2%B7+Foundation-Sec+%C2%B7+AI+Assistant" alt="AgentWatch" />
+<img src="https://readme-typing-svg.demolab.com?font=Syne&weight=800&size=24&duration=3000&pause=1000&color=00E5FF&center=true&vCenter=true&width=1200&lines=AgentWatch+%E2%80%94+AI+Agent+Observability+for+Splunk;Real-time+anomaly+detection+for+AI+agents;Loop+detected+%E2%80%94+search_tool+called+23%C3%97+in+4s;Foundation-Sec+root+cause+in+plain+English;Splunk+MCP+%C2%B7+AI+Toolkit+%C2%B7+Foundation-Sec+%C2%B7+AI+Assistant" alt="AgentWatch" />
 
 </div>
 
