@@ -1,188 +1,211 @@
-<svg width="680" height="920" viewBox="0 0 680 920" xmlns="http://www.w3.org/2000/svg" role="img">
+<svg width="720" height="960" viewBox="0 0 720 960" xmlns="http://www.w3.org/2000/svg">
 <title>AgentWatch system architecture</title>
-<desc>Four-layer architecture: AI Agent Layer, Backend Layer, Splunk Platform, and Frontend Layer</desc>
 <defs>
-<marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-<path d="M2 1L8 5L2 9" fill="none" stroke="#666" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-</marker>
-<style>
-text { font-family: 'Segoe UI', Arial, sans-serif; fill: #1a1a2e; }
-.th  { font-size: 13px; font-weight: 600; }
-.ts  { font-size: 11px; fill: #3a3a5c; }
-.layer-label { font-size: 13px; font-weight: 700; fill: #fff; }
-</style>
+  <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+    <path d="M2 2L8 5L2 8" fill="none" stroke="#4a6080" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </marker>
+  <filter id="glow">
+    <feGaussianBlur stdDeviation="2" result="blur"/>
+    <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
 </defs>
 
 <!-- BG -->
-<rect width="680" height="920" fill="#f8f9ff"/>
+<rect width="720" height="960" fill="#050810"/>
 
-<!-- AGENT LAYER -->
-<rect x="20" y="16" width="640" height="108" rx="12" fill="#7F77DD" fill-opacity="0.13" stroke="#7F77DD" stroke-width="1"/>
-<text class="th" x="36" y="38" fill="#3C3489">Agent layer</text>
+<!-- ── AGENT LAYER ── -->
+<rect x="18" y="14" width="684" height="114" rx="10" fill="#0d0f1e" stroke="#4a3a8a" stroke-width="1"/>
+<text x="30" y="32" font-family="'Segoe UI',Arial,sans-serif" font-size="10" font-weight="700" fill="#7b6fd4" letter-spacing="2">AGENT LAYER</text>
 
-<rect x="36" y="48" width="148" height="64" rx="8" fill="#EEEDFE" stroke="#7F77DD" stroke-width="0.8"/>
-<text class="th" x="110" y="68" text-anchor="middle" fill="#3C3489">AgentWatch SDK</text>
-<text class="ts" x="110" y="84" text-anchor="middle">@watch · watch_graph</text>
-<text class="ts" x="110" y="98" text-anchor="middle">emit_event · Context</text>
+<rect x="30" y="40" width="156" height="76" rx="7" fill="#0a0b18" stroke="#4a3a8a" stroke-width="0.8"/>
+<text x="108" y="58" font-family="'Segoe UI',Arial,sans-serif" font-size="11" font-weight="700" fill="#9d8ff5" text-anchor="middle">AgentWatch SDK</text>
+<text x="108" y="73" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#5a4a9a" text-anchor="middle">@watch · watch_graph</text>
+<text x="108" y="86" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#5a4a9a" text-anchor="middle">emit_event · Context</text>
+<text x="108" y="99" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#5a4a9a" text-anchor="middle">new_trace()</text>
 
-<rect x="200" y="48" width="148" height="64" rx="8" fill="#EEEDFE" stroke="#7F77DD" stroke-width="0.8"/>
-<text class="th" x="274" y="68" text-anchor="middle" fill="#3C3489">Framework hooks</text>
-<text class="ts" x="274" y="84" text-anchor="middle">LangGraph · CrewAI</text>
-<text class="ts" x="274" y="98" text-anchor="middle">OpenAI Agents · AutoGen</text>
+<rect x="200" y="40" width="156" height="76" rx="7" fill="#0a0b18" stroke="#4a3a8a" stroke-width="0.8"/>
+<text x="278" y="58" font-family="'Segoe UI',Arial,sans-serif" font-size="11" font-weight="700" fill="#9d8ff5" text-anchor="middle">Framework Hooks</text>
+<text x="278" y="73" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#5a4a9a" text-anchor="middle">LangGraph · CrewAI</text>
+<text x="278" y="86" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#5a4a9a" text-anchor="middle">OpenAI Agents · AutoGen</text>
+<text x="278" y="99" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#5a4a9a" text-anchor="middle">@watch_tool / @watch_llm</text>
 
-<rect x="364" y="48" width="148" height="64" rx="8" fill="#EEEDFE" stroke="#7F77DD" stroke-width="0.8"/>
-<text class="th" x="438" y="68" text-anchor="middle" fill="#3C3489">OpenTelemetry</text>
-<text class="ts" x="438" y="84" text-anchor="middle">traces · spans · trust</text>
-<text class="ts" x="438" y="98" text-anchor="middle">tokens · latency</text>
+<rect x="370" y="40" width="156" height="76" rx="7" fill="#0a0b18" stroke="#4a3a8a" stroke-width="0.8"/>
+<text x="448" y="58" font-family="'Segoe UI',Arial,sans-serif" font-size="11" font-weight="700" fill="#9d8ff5" text-anchor="middle">OpenTelemetry</text>
+<text x="448" y="73" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#5a4a9a" text-anchor="middle">traces · spans</text>
+<text x="448" y="86" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#5a4a9a" text-anchor="middle">trust scores · tokens</text>
+<text x="448" y="99" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#5a4a9a" text-anchor="middle">latency · step IDs</text>
 
-<rect x="528" y="48" width="116" height="64" rx="8" fill="#EEEDFE" stroke="#7F77DD" stroke-width="0.8"/>
-<text class="th" x="586" y="68" text-anchor="middle" fill="#3C3489">Demo agent</text>
-<text class="ts" x="586" y="84" text-anchor="middle">normal · loop</text>
-<text class="ts" x="586" y="98" text-anchor="middle">hallucinate · drift</text>
+<rect x="540" y="40" width="156" height="76" rx="7" fill="#0a0b18" stroke="#4a3a8a" stroke-width="0.8"/>
+<text x="618" y="58" font-family="'Segoe UI',Arial,sans-serif" font-size="11" font-weight="700" fill="#9d8ff5" text-anchor="middle">Demo Agent</text>
+<text x="618" y="73" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#5a4a9a" text-anchor="middle">normal · loop</text>
+<text x="618" y="86" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#5a4a9a" text-anchor="middle">hallucinate · drift</text>
+<text x="618" y="99" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#5a4a9a" text-anchor="middle">4 failure modes</text>
 
 <!-- Arrow 1 -->
-<line x1="340" y1="124" x2="340" y2="158" stroke="#888" stroke-width="1" marker-end="url(#arrow)"/>
-<text class="ts" x="352" y="145" fill="#888">events</text>
+<line x1="360" y1="128" x2="360" y2="158" stroke="#2a3a5a" stroke-width="1" marker-end="url(#arr)"/>
+<text x="372" y="148" font-family="'Segoe UI',Arial,sans-serif" font-size="8" fill="#3a5070">events</text>
 
-<!-- BACKEND LAYER -->
-<rect x="20" y="160" width="640" height="180" rx="12" fill="#1D9E75" fill-opacity="0.10" stroke="#1D9E75" stroke-width="1"/>
-<text class="th" x="36" y="182" fill="#085041">Backend layer</text>
+<!-- ── BACKEND LAYER ── -->
+<rect x="18" y="162" width="684" height="186" rx="10" fill="#0a130d" stroke="#1a5a3a" stroke-width="1"/>
+<text x="30" y="180" font-family="'Segoe UI',Arial,sans-serif" font-size="10" font-weight="700" fill="#2a9a6a" letter-spacing="2">BACKEND LAYER</text>
 
-<rect x="36" y="192" width="140" height="136" rx="8" fill="#E1F5EE" stroke="#1D9E75" stroke-width="0.8"/>
-<text class="th" x="106" y="212" text-anchor="middle" fill="#085041">FastAPI</text>
-<text class="ts" x="106" y="228" text-anchor="middle">/api/explain</text>
-<text class="ts" x="106" y="242" text-anchor="middle">/api/query · /api/history</text>
-<text class="ts" x="106" y="256" text-anchor="middle">/api/config</text>
-<text class="ts" x="106" y="270" text-anchor="middle">/api/export/incident</text>
-<text class="ts" x="106" y="284" text-anchor="middle">/api/demo/trigger</text>
-<text class="ts" x="106" y="298" text-anchor="middle">/api/autopsy</text>
+<rect x="30" y="188" width="156" height="148" rx="7" fill="#080f0a" stroke="#1a5a3a" stroke-width="0.8"/>
+<text x="108" y="206" font-family="'Segoe UI',Arial,sans-serif" font-size="11" font-weight="700" fill="#2ac88a" text-anchor="middle">FastAPI</text>
+<text x="108" y="221" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#1a7a5a" text-anchor="middle">/api/explain  /api/query</text>
+<text x="108" y="234" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#1a7a5a" text-anchor="middle">/api/autopsy  /api/history</text>
+<text x="108" y="247" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#1a7a5a" text-anchor="middle">/api/config</text>
+<text x="108" y="260" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#1a7a5a" text-anchor="middle">/api/export/incident</text>
+<text x="108" y="273" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#1a7a5a" text-anchor="middle">/api/demo/trigger</text>
+<text x="108" y="286" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#1a7a5a" text-anchor="middle">serves / /ops /topology</text>
+<text x="108" y="299" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#1a7a5a" text-anchor="middle">Slack webhook · PDF</text>
+<text x="108" y="312" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#1a7a5a" text-anchor="middle">14 endpoints total</text>
 
-<rect x="192" y="192" width="140" height="136" rx="8" fill="#E1F5EE" stroke="#1D9E75" stroke-width="0.8"/>
-<text class="th" x="262" y="212" text-anchor="middle" fill="#085041">AnomalyDetector</text>
-<text class="ts" x="262" y="228" text-anchor="middle">loop ≥5 calls</text>
-<text class="ts" x="262" y="242" text-anchor="middle">token spike ≥3k</text>
-<text class="ts" x="262" y="256" text-anchor="middle">latency drift ≥3s</text>
-<text class="ts" x="262" y="270" text-anchor="middle">error burst ≥3</text>
-<text class="ts" x="262" y="284" text-anchor="middle">trust collapse ≤0.3</text>
-<text class="ts" x="262" y="298" text-anchor="middle">configurable via UI</text>
+<rect x="200" y="188" width="156" height="148" rx="7" fill="#080f0a" stroke="#1a5a3a" stroke-width="0.8"/>
+<text x="278" y="206" font-family="'Segoe UI',Arial,sans-serif" font-size="11" font-weight="700" fill="#2ac88a" text-anchor="middle">AnomalyDetector</text>
+<text x="278" y="221" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#1a7a5a" text-anchor="middle">loop ≥5 calls</text>
+<text x="278" y="234" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#1a7a5a" text-anchor="middle">token spike ≥3,000</text>
+<text x="278" y="247" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#1a7a5a" text-anchor="middle">latency drift ≥3,000ms</text>
+<text x="278" y="260" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#1a7a5a" text-anchor="middle">error burst ≥3</text>
+<text x="278" y="273" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#1a7a5a" text-anchor="middle">trust collapse ≤0.3</text>
+<text x="278" y="286" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#1a7a5a" text-anchor="middle">configurable via UI</text>
+<text x="278" y="299" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#1a7a5a" text-anchor="middle">CRITICAL → Slack</text>
 
-<rect x="348" y="192" width="140" height="136" rx="8" fill="#E1F5EE" stroke="#1D9E75" stroke-width="0.8"/>
-<text class="th" x="418" y="212" text-anchor="middle" fill="#085041">WebSocket</text>
-<text class="ts" x="418" y="228" text-anchor="middle">/ws/agent-stream</text>
-<text class="ts" x="418" y="242" text-anchor="middle">/ws/browser</text>
-<text class="ts" x="418" y="256" text-anchor="middle">500-event buffer</text>
-<text class="ts" x="418" y="270" text-anchor="middle">100-event replay</text>
-<text class="ts" x="418" y="284" text-anchor="middle">Slack webhook</text>
-<text class="ts" x="418" y="298" text-anchor="middle">PDF export</text>
+<rect x="370" y="188" width="156" height="148" rx="7" fill="#080f0a" stroke="#1a5a3a" stroke-width="0.8"/>
+<text x="448" y="206" font-family="'Segoe UI',Arial,sans-serif" font-size="11" font-weight="700" fill="#2ac88a" text-anchor="middle">WebSocket</text>
+<text x="448" y="221" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#1a7a5a" text-anchor="middle">/ws/agent-stream</text>
+<text x="448" y="234" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#1a7a5a" text-anchor="middle">/ws/browser</text>
+<text x="448" y="247" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#1a7a5a" text-anchor="middle">500-event ring buffer</text>
+<text x="448" y="260" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#1a7a5a" text-anchor="middle">100-event replay</text>
+<text x="448" y="273" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#1a7a5a" text-anchor="middle">fan-out broadcast</text>
+<text x="448" y="286" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#1a7a5a" text-anchor="middle">auto-reconnect</text>
 
-<rect x="504" y="192" width="140" height="136" rx="8" fill="#E1F5EE" stroke="#1D9E75" stroke-width="0.8"/>
-<text class="th" x="574" y="212" text-anchor="middle" fill="#085041">SplunkClient</text>
-<text class="ts" x="574" y="228" text-anchor="middle">HEC indexing</text>
-<text class="ts" x="574" y="242" text-anchor="middle">SPL search REST</text>
-<text class="ts" x="574" y="256" text-anchor="middle">AI Assistant NL→SPL</text>
-<text class="ts" x="574" y="270" text-anchor="middle">Foundation-Sec</text>
-<text class="ts" x="574" y="284" text-anchor="middle">Autopsy A–F</text>
-<text class="ts" x="574" y="298" text-anchor="middle">template fallback</text>
+<rect x="540" y="188" width="156" height="148" rx="7" fill="#080f0a" stroke="#1a5a3a" stroke-width="0.8"/>
+<text x="618" y="206" font-family="'Segoe UI',Arial,sans-serif" font-size="11" font-weight="700" fill="#2ac88a" text-anchor="middle">SplunkClient</text>
+<text x="618" y="221" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#1a7a5a" text-anchor="middle">HEC indexing</text>
+<text x="618" y="234" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#1a7a5a" text-anchor="middle">SPL search REST</text>
+<text x="618" y="247" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#1a7a5a" text-anchor="middle">AI Assistant NL→SPL</text>
+<text x="618" y="260" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#1a7a5a" text-anchor="middle">Foundation-Sec client</text>
+<text x="618" y="273" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#1a7a5a" text-anchor="middle">Autopsy A–F</text>
+<text x="618" y="286" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#1a7a5a" text-anchor="middle">template fallback</text>
 
-<!-- Arrow 2 -->
-<line x1="574" y1="340" x2="574" y2="374" stroke="#888" stroke-width="1" marker-end="url(#arrow)"/>
-<text class="ts" x="586" y="360" fill="#888">HEC POST</text>
-<line x1="200" y1="340" x2="200" y2="374" stroke="#888" stroke-width="1" marker-end="url(#arrow)"/>
-<text class="ts" x="212" y="360" fill="#888">anomaly events</text>
+<!-- Arrow 2a -->
+<line x1="618" y1="348" x2="618" y2="380" stroke="#2a3a5a" stroke-width="1" marker-end="url(#arr)"/>
+<text x="630" y="368" font-family="'Segoe UI',Arial,sans-serif" font-size="8" fill="#3a5070">HEC POST</text>
+<line x1="278" y1="348" x2="278" y2="380" stroke="#2a3a5a" stroke-width="1" marker-end="url(#arr)"/>
+<text x="290" y="368" font-family="'Segoe UI',Arial,sans-serif" font-size="8" fill="#3a5070">anomaly</text>
 
-<!-- SPLUNK LAYER -->
-<rect x="20" y="376" width="640" height="200" rx="12" fill="#D85A30" fill-opacity="0.10" stroke="#D85A30" stroke-width="1"/>
-<text class="th" x="36" y="398" fill="#712B13">Splunk platform</text>
+<!-- ── SPLUNK LAYER ── -->
+<rect x="18" y="384" width="684" height="198" rx="10" fill="#130a06" stroke="#7a3010" stroke-width="1"/>
+<text x="30" y="402" font-family="'Segoe UI',Arial,sans-serif" font-size="10" font-weight="700" fill="#c85020" letter-spacing="2">SPLUNK PLATFORM</text>
 
-<rect x="36" y="408" width="140" height="152" rx="8" fill="#FAECE7" stroke="#D85A30" stroke-width="0.8"/>
-<text class="th" x="106" y="428" text-anchor="middle" fill="#712B13">Splunk HEC</text>
-<text class="ts" x="106" y="444" text-anchor="middle">index: agentwatch</text>
-<text class="ts" x="106" y="458" text-anchor="middle">agentwatch:otel</text>
-<text class="ts" x="106" y="472" text-anchor="middle">1,269+ events</text>
-<text class="ts" x="106" y="486" text-anchor="middle">props.conf</text>
-<text class="ts" x="106" y="500" text-anchor="middle">transforms.conf</text>
-<text class="ts" x="106" y="514" text-anchor="middle">savedsearches.conf</text>
+<rect x="30" y="410" width="156" height="160" rx="7" fill="#0f0804" stroke="#7a3010" stroke-width="0.8"/>
+<text x="108" y="428" font-family="'Segoe UI',Arial,sans-serif" font-size="11" font-weight="700" fill="#e06030" text-anchor="middle">Splunk HEC</text>
+<text x="108" y="443" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#8a4020" text-anchor="middle">index: agentwatch</text>
+<text x="108" y="456" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#8a4020" text-anchor="middle">agentwatch:otel</text>
+<text x="108" y="469" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#8a4020" text-anchor="middle">1,269+ events</text>
+<text x="108" y="482" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#8a4020" text-anchor="middle">props.conf</text>
+<text x="108" y="495" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#8a4020" text-anchor="middle">transforms.conf</text>
+<text x="108" y="508" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#8a4020" text-anchor="middle">savedsearches.conf</text>
+<text x="108" y="521" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#8a4020" text-anchor="middle">Splunkbase app pkg</text>
+<text x="108" y="534" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#8a4020" text-anchor="middle">splunk_app/</text>
 
-<rect x="192" y="408" width="140" height="152" rx="8" fill="#FAECE7" stroke="#D85A30" stroke-width="0.8"/>
-<text class="th" x="262" y="428" text-anchor="middle" fill="#712B13">AI Toolkit</text>
-<text class="ts" x="262" y="444" text-anchor="middle">anomalydetection</text>
-<text class="ts" x="262" y="458" text-anchor="middle">tool-call time-series</text>
-<text class="ts" x="262" y="472" text-anchor="middle">99.25% confidence</text>
-<text class="ts" x="262" y="486" text-anchor="middle">139-call spike caught</text>
-<text class="ts" x="262" y="500" text-anchor="middle">180 anomalies total</text>
+<rect x="200" y="410" width="156" height="160" rx="7" fill="#0f0804" stroke="#7a3010" stroke-width="0.8"/>
+<text x="278" y="428" font-family="'Segoe UI',Arial,sans-serif" font-size="11" font-weight="700" fill="#e06030" text-anchor="middle">AI Toolkit</text>
+<text x="278" y="443" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#8a4020" text-anchor="middle">anomalydetection cmd</text>
+<text x="278" y="456" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#8a4020" text-anchor="middle">tool-call time-series</text>
+<text x="278" y="469" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#8a4020" text-anchor="middle">99.25% confidence</text>
+<text x="278" y="482" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#8a4020" text-anchor="middle">139-call spike caught</text>
+<text x="278" y="495" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#8a4020" text-anchor="middle">180 anomalies total</text>
+<text x="278" y="508" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#8a4020" text-anchor="middle">Cisco Deep Time Series</text>
 
-<rect x="348" y="408" width="140" height="152" rx="8" fill="#FAECE7" stroke="#D85A30" stroke-width="0.8"/>
-<text class="th" x="418" y="428" text-anchor="middle" fill="#712B13">Foundation-Sec-1.1-8B</text>
-<text class="ts" x="418" y="444" text-anchor="middle">Splunk hosted model</text>
-<text class="ts" x="418" y="458" text-anchor="middle">Explain This button</text>
-<text class="ts" x="418" y="472" text-anchor="middle">Agent Autopsy A–F</text>
-<text class="ts" x="418" y="486" text-anchor="middle">root cause + fix</text>
-<text class="ts" x="418" y="500" text-anchor="middle">cost estimate</text>
+<rect x="370" y="410" width="156" height="160" rx="7" fill="#0f0804" stroke="#7a3010" stroke-width="0.8"/>
+<text x="448" y="428" font-family="'Segoe UI',Arial,sans-serif" font-size="10" font-weight="700" fill="#e06030" text-anchor="middle">Foundation-Sec-1.1-8B</text>
+<text x="448" y="443" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#8a4020" text-anchor="middle">Splunk hosted model</text>
+<text x="448" y="456" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#8a4020" text-anchor="middle">Explain This button</text>
+<text x="448" y="469" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#8a4020" text-anchor="middle">Agent Autopsy A–F</text>
+<text x="448" y="482" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#8a4020" text-anchor="middle">root cause + fix</text>
+<text x="448" y="495" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#8a4020" text-anchor="middle">cost estimate</text>
+<text x="448" y="508" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#8a4020" text-anchor="middle">PDF incident export</text>
+<text x="448" y="521" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#8a4020" text-anchor="middle">rule-based fallback</text>
 
-<rect x="504" y="408" width="140" height="152" rx="8" fill="#FAECE7" stroke="#D85A30" stroke-width="0.8"/>
-<text class="th" x="574" y="428" text-anchor="middle" fill="#712B13">MCP + AI Assistant</text>
-<text class="ts" x="574" y="444" text-anchor="middle">MCP Server</text>
-<text class="ts" x="574" y="458" text-anchor="middle">all telemetry SPL</text>
-<text class="ts" x="574" y="472" text-anchor="middle">AI Assistant NL→SPL</text>
-<text class="ts" x="574" y="486" text-anchor="middle">"show loops last hour"</text>
-<text class="ts" x="574" y="500" text-anchor="middle">→ valid SPL query</text>
+<rect x="540" y="410" width="156" height="160" rx="7" fill="#0f0804" stroke="#7a3010" stroke-width="0.8"/>
+<text x="618" y="428" font-family="'Segoe UI',Arial,sans-serif" font-size="11" font-weight="700" fill="#e06030" text-anchor="middle">MCP + AI Assistant</text>
+<text x="618" y="443" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#8a4020" text-anchor="middle">MCP Server</text>
+<text x="618" y="456" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#8a4020" text-anchor="middle">all telemetry in SPL</text>
+<text x="618" y="469" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#8a4020" text-anchor="middle">AI Assistant NL→SPL</text>
+<text x="618" y="482" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#8a4020" text-anchor="middle">show loops last hour</text>
+<text x="618" y="495" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#8a4020" text-anchor="middle">→ valid SPL query</text>
+<text x="618" y="508" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#8a4020" text-anchor="middle">8-panel dashboard</text>
 
 <!-- Arrow 3 -->
-<line x1="340" y1="576" x2="340" y2="610" stroke="#888" stroke-width="1" marker-end="url(#arrow)"/>
-<text class="ts" x="352" y="596" fill="#888">WS events</text>
+<line x1="360" y1="582" x2="360" y2="612" stroke="#2a3a5a" stroke-width="1" marker-end="url(#arr)"/>
+<text x="372" y="601" font-family="'Segoe UI',Arial,sans-serif" font-size="8" fill="#3a5070">WS events</text>
 
-<!-- FRONTEND LAYER -->
-<rect x="20" y="612" width="640" height="280" rx="12" fill="#378ADD" fill-opacity="0.10" stroke="#378ADD" stroke-width="1"/>
-<text class="th" x="36" y="634" fill="#0C447C">Frontend layer</text>
+<!-- ── FRONTEND LAYER ── -->
+<rect x="18" y="616" width="684" height="288" rx="10" fill="#080d18" stroke="#1a3a7a" stroke-width="1"/>
+<text x="30" y="634" font-family="'Segoe UI',Arial,sans-serif" font-size="10" font-weight="700" fill="#2a6acc" letter-spacing="2">FRONTEND LAYER</text>
 
-<rect x="36" y="644" width="140" height="148" rx="8" fill="#E6F1FB" stroke="#378ADD" stroke-width="0.8"/>
-<text class="th" x="106" y="664" text-anchor="middle" fill="#0C447C">Live Brain /</text>
-<text class="ts" x="106" y="680" text-anchor="middle">Three.js r128</text>
-<text class="ts" x="106" y="694" text-anchor="middle">force-directed graph</text>
-<text class="ts" x="106" y="708" text-anchor="middle">trust-score colors</text>
-<text class="ts" x="106" y="722" text-anchor="middle">anomaly glow + ring</text>
-<text class="ts" x="106" y="736" text-anchor="middle">click → inspector</text>
-<text class="ts" x="106" y="750" text-anchor="middle">brain.js</text>
+<rect x="30" y="642" width="156" height="154" rx="7" fill="#060a14" stroke="#1a3a7a" stroke-width="0.8"/>
+<text x="108" y="660" font-family="'Segoe UI',Arial,sans-serif" font-size="11" font-weight="700" fill="#4a8aee" text-anchor="middle">Live Brain  /</text>
+<text x="108" y="675" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">Three.js r128</text>
+<text x="108" y="688" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">force-directed graph</text>
+<text x="108" y="701" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">trust-score colors</text>
+<text x="108" y="714" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">anomaly glow + ring</text>
+<text x="108" y="727" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">click → inspector</text>
+<text x="108" y="740" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">⚙ alert rules config</text>
+<text x="108" y="753" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">brain.js</text>
+<text x="108" y="766" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">alerts.js · assistant.js</text>
+<text x="108" y="779" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">sparklines · timeline</text>
 
-<rect x="192" y="644" width="140" height="148" rx="8" fill="#E6F1FB" stroke="#378ADD" stroke-width="0.8"/>
-<text class="th" x="262" y="664" text-anchor="middle" fill="#0C447C">Agent Ops /ops</text>
-<text class="ts" x="262" y="680" text-anchor="middle">CRM dashboard</text>
-<text class="ts" x="262" y="694" text-anchor="middle">run history table</text>
-<text class="ts" x="262" y="708" text-anchor="middle">trust trend chart</text>
-<text class="ts" x="262" y="722" text-anchor="middle">cost tracker</text>
-<text class="ts" x="262" y="736" text-anchor="middle">SLO manager</text>
-<text class="ts" x="262" y="750" text-anchor="middle">ops.html</text>
+<rect x="200" y="642" width="156" height="154" rx="7" fill="#060a14" stroke="#1a3a7a" stroke-width="0.8"/>
+<text x="278" y="660" font-family="'Segoe UI',Arial,sans-serif" font-size="11" font-weight="700" fill="#4a8aee" text-anchor="middle">Agent Ops  /ops</text>
+<text x="278" y="675" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">CRM dashboard</text>
+<text x="278" y="688" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">run history table</text>
+<text x="278" y="701" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">trust trend chart</text>
+<text x="278" y="714" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">anomaly doughnut</text>
+<text x="278" y="727" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">SLO manager</text>
+<text x="278" y="740" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">cost tracker</text>
+<text x="278" y="753" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">live activity feed</text>
+<text x="278" y="766" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">Chart.js 4.4</text>
+<text x="278" y="779" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">ops.html</text>
 
-<rect x="348" y="644" width="140" height="148" rx="8" fill="#E6F1FB" stroke="#378ADD" stroke-width="0.8"/>
-<text class="th" x="418" y="664" text-anchor="middle" fill="#0C447C">Topology /topology</text>
-<text class="ts" x="418" y="680" text-anchor="middle">multi-agent graph</text>
-<text class="ts" x="418" y="694" text-anchor="middle">Three.js r128</text>
-<text class="ts" x="418" y="708" text-anchor="middle">force-directed</text>
-<text class="ts" x="418" y="722" text-anchor="middle">edge particles</text>
-<text class="ts" x="418" y="736" text-anchor="middle">orbit camera</text>
-<text class="ts" x="418" y="750" text-anchor="middle">topology.html</text>
+<rect x="370" y="642" width="156" height="154" rx="7" fill="#060a14" stroke="#1a3a7a" stroke-width="0.8"/>
+<text x="448" y="660" font-family="'Segoe UI',Arial,sans-serif" font-size="11" font-weight="700" fill="#4a8aee" text-anchor="middle">Topology  /topology</text>
+<text x="448" y="675" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">multi-agent graph</text>
+<text x="448" y="688" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">Three.js r128</text>
+<text x="448" y="701" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">force-directed layout</text>
+<text x="448" y="714" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">edge particles</text>
+<text x="448" y="727" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">orbit camera</text>
+<text x="448" y="740" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">node inspector</text>
+<text x="448" y="753" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">agent hub nodes</text>
+<text x="448" y="766" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">topology.html</text>
 
-<rect x="504" y="644" width="140" height="148" rx="8" fill="#E6F1FB" stroke="#378ADD" stroke-width="0.8"/>
-<text class="th" x="574" y="664" text-anchor="middle" fill="#0C447C">UI modules</text>
-<text class="ts" x="574" y="680" text-anchor="middle">alert rules config</text>
-<text class="ts" x="574" y="694" text-anchor="middle">incident PDF export</text>
-<text class="ts" x="574" y="708" text-anchor="middle">AI Assistant panel</text>
-<text class="ts" x="574" y="722" text-anchor="middle">health score</text>
-<text class="ts" x="574" y="736" text-anchor="middle">sparklines · timeline</text>
-<text class="ts" x="574" y="750" text-anchor="middle">autopsy panel</text>
+<rect x="540" y="642" width="156" height="154" rx="7" fill="#060a14" stroke="#1a3a7a" stroke-width="0.8"/>
+<text x="618" y="660" font-family="'Segoe UI',Arial,sans-serif" font-size="11" font-weight="700" fill="#4a8aee" text-anchor="middle">UI Modules</text>
+<text x="618" y="675" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">alert rules configurator</text>
+<text x="618" y="688" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">incident PDF export</text>
+<text x="618" y="701" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">AI Assistant panel</text>
+<text x="618" y="714" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">health score</text>
+<text x="618" y="727" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">sparklines</text>
+<text x="618" y="740" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">trace timeline</text>
+<text x="618" y="753" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">autopsy panel</text>
 
-<!-- Splunk App + Deploy row -->
-<rect x="36" y="808" width="290" height="68" rx="8" fill="#F1EFE8" stroke="#888780" stroke-width="0.8"/>
-<text class="th" x="181" y="828" text-anchor="middle" fill="#444441">Splunk Cloud native app</text>
-<text class="ts" x="181" y="844" text-anchor="middle">splunk_app/ · app.conf · props.conf</text>
-<text class="ts" x="181" y="858" text-anchor="middle">transforms · savedsearches · inputs</text>
+<!-- Bottom row -->
+<rect x="30" y="812" width="320" height="62" rx="7" fill="#060a14" stroke="#1a3a7a" stroke-width="0.8"/>
+<text x="190" y="832" font-family="'Segoe UI',Arial,sans-serif" font-size="11" font-weight="700" fill="#4a8aee" text-anchor="middle">Splunk Cloud Native App</text>
+<text x="190" y="847" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">splunk_app/ · app.conf · indexes.conf · inputs.conf</text>
+<text x="190" y="860" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">props.conf · transforms.conf · savedsearches.conf</text>
 
-<rect x="354" y="808" width="290" height="68" rx="8" fill="#F1EFE8" stroke="#888780" stroke-width="0.8"/>
-<text class="th" x="499" y="828" text-anchor="middle" fill="#444441">Deploy</text>
-<text class="ts" x="499" y="844" text-anchor="middle">Railway (FastAPI + frontend)</text>
-<text class="ts" x="499" y="858" text-anchor="middle">GitHub Pages (landing) · MIT license</text>
+<rect x="370" y="812" width="326" height="62" rx="7" fill="#060a14" stroke="#1a3a7a" stroke-width="0.8"/>
+<text x="533" y="832" font-family="'Segoe UI',Arial,sans-serif" font-size="11" font-weight="700" fill="#4a8aee" text-anchor="middle">Deploy</text>
+<text x="533" y="847" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">Railway (FastAPI + frontend) · GitHub Pages (landing)</text>
+<text x="533" y="860" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#2a5aaa" text-anchor="middle">MIT License · Python 3.10 · open source</text>
 
 <!-- Stats strip -->
-<rect x="20" y="888" width="640" height="20" rx="6" fill="#e8eaf6" stroke="#c5c8e8" stroke-width="0.5"/>
-<text class="ts" x="340" y="902" text-anchor="middle" fill="#555">1,269+ events · 180 anomalies · 59.7% avg trust · 159,970 tokens · 99.25% loop confidence</text>
+<rect x="18" y="890" width="684" height="22" rx="5" fill="#0a0d18" stroke="#1a2a4a" stroke-width="0.5"/>
+<text x="360" y="905" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#3a5a8a" text-anchor="middle">1,269+ events · 180 anomalies · 59.7% avg trust · 159,970 tokens · 99.25% loop confidence · 5 frameworks · 3 pages · 14 endpoints</text>
+
+<!-- Track badge -->
+<rect x="18" y="928" width="684" height="22" rx="5" fill="#0a0810" stroke="#3a1a6a" stroke-width="0.5"/>
+<text x="360" y="943" font-family="'Segoe UI',Arial,sans-serif" font-size="9" fill="#6a3a9a" text-anchor="middle">Track: Platform &amp; Developer Experience  ·  Splunk Agentic Ops Hackathon 2026  ·  $20,000 in prizes</text>
 </svg>
