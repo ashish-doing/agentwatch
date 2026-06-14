@@ -58,7 +58,7 @@
 
 ## The Gap in AI Agent Monitoring
 
-**1,269 events indexed. 180 anomalies detected. 4 Splunk AI capabilities unified in one pipeline.**
+**2,299 events indexed. 342 anomalies detected. 4 Splunk AI capabilities unified in one pipeline.**
 
 AI agents are entering production faster than teams can instrument them. When a LangGraph agent calls the same tool 23 times in 4 seconds, when token counts spike to 8,000+, when trust scores drop to 5% — most teams find out hours later from user complaints or API bills. Existing observability tools (Datadog, LangSmith, Arize) are not Splunk-native, meaning enterprises already running Splunk infrastructure have to maintain a separate monitoring stack.
 
@@ -103,9 +103,9 @@ AgentWatch wraps any LangGraph, CrewAI, or OpenAI Agents SDK agent with OpenTele
 ---
 
 ### 📊 Splunk Dashboard — Real Telemetry
-*Native Splunk dashboard showing real indexed data: 1,269 total events, 180 anomalies detected, 59.7% avg trust score, 1 active agent, 159,970 total tokens. Panels include agent run value timeline, anomaly detection (2968), tool call frequency, token usage by step, and trust score by tool — all from `index=agentwatch`.*
+*Native Splunk dashboard showing real indexed data: 2,299 total events, 342 anomalies detected, 58.1% avg trust score, 1 active agent, 279,993 total tokens. Panels include agent events over time, tool call frequency (loop detection), token usage by step, trust score by tool, and recent anomalies table — all from `index=agentwatch`.*
 
-![AgentWatch Splunk Dashboard — 1,269 events, 180 anomalies, 59.7% avg trust, 159,970 tokens](docs/screenshots/screenshot-dashboard.png)
+![AgentWatch Splunk Dashboard — 2,299 events, 342 anomalies, 58.1% avg trust, 279,993 tokens](docs/screenshots/screenshot-dashboard.png)
 
 ---
 
@@ -198,7 +198,7 @@ ANY AGENT (LangGraph · CrewAI · OpenAI Agents · AutoGen)
 | Capability | How AgentWatch Uses It |
 |---|---|
 | **Splunk MCP Server** | All agent telemetry indexed to `index=agentwatch`; SPL queries run directly from the UI assistant panel |
-| **Splunk AI Toolkit** | `anomalydetection` on tool-call time-series — Stage 2 statistical confirmation at 99.25% confidence, 180 anomalies caught |
+| **Splunk AI Toolkit** | `anomalydetection` on tool-call time-series — 99.25% confidence, 342 anomalies caught |
 | **Foundation-Sec-1.1-8B** | "Explain This" per-anomaly root cause + "Run Autopsy" full-trace graded report + PDF incident export |
 | **Splunk AI Assistant** | NL → SPL; type "show me all loops in the last hour" → live SPL results |
 
@@ -582,7 +582,7 @@ agentwatch/
 │   │   ├── screenshot-hero.png         # Live Brain — anomaly detected
 │   │   ├── screenshot-ops.png          # Agent Ops CRM Dashboard
 │   │   ├── screenshot-topology.png     # Multi-Agent Topology Map
-│   │   └── screenshot-splunk-tools.png # All 4 Splunk AI tools active
+│   │   └── screenshot-dashboard.png    # Splunk dashboard — real telemetry
 │   └── index.html                 # GitHub Pages landing
 ├── architecture.svg               # Architecture diagram (dark theme)
 ├── architecture.md                # Annotated architecture with data flows
@@ -598,10 +598,10 @@ agentwatch/
 
 | Metric | Value |
 |---|---|
-| Events indexed | 1,269+ |
-| Anomalies detected | 180 |
-| Avg trust score | 59.7% |
-| Tokens processed | 159,970 |
+| Events indexed | 2,299+ |
+| Anomalies detected | 342 |
+| Avg trust score | 58.1% |
+| Tokens processed | 279,993 |
 | Loop confidence (Splunk AI Toolkit) | 99.25% |
 | Frameworks supported | 5 |
 | Frontend pages | 3 |
