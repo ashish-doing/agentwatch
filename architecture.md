@@ -39,7 +39,7 @@ flowchart TD
     end
 
     subgraph SPLUNK["☁️ SPLUNK PLATFORM"]
-        HEC["Splunk HEC\n━━━━━━━━━━━━━━━\nindex: agentwatch\nsourcetype:\nagentwatch:otel\n1,269+ events\nprops + transforms\nsavedsearches.conf"]
+        HEC["Splunk HEC\n━━━━━━━━━━━━━━━\nindex: agentwatch\nsourcetype:\nagentwatch:otel\n2,299+ events\nprops + transforms\nsavedsearches.conf"]
         AITK["Splunk AI Toolkit\n━━━━━━━━━━━━━━━\nnative anomalydetection\n• tool call frequency\n• time-series analysis\n• 99.25% confidence"]
         MCP["Splunk MCP Server\n━━━━━━━━━━━━━━━\n• all telemetry indexed\n• NL query interface\n• SPL generation"]
         ASST["Splunk AI Assistant\n━━━━━━━━━━━━━━━\nNatural Language → SPL\nshow loops last hour\n→ valid SPL query"]
