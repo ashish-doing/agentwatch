@@ -741,5 +741,8 @@ if FRONTEND_DIR.exists():
     async def serve_topology():
         return FileResponse(str(FRONTEND_DIR / "topology.html"))
 
+    @app.get("/guide.js")
+    async def serve_guide():
+        return FileResponse(str(FRONTEND_DIR / "guide.js"))
 else:
     logger.warning(f"Frontend directory not found at {FRONTEND_DIR} — static serving disabled.")
