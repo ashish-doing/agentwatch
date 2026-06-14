@@ -82,7 +82,7 @@ AI agents are entering production every day — and failing silently. When your 
 
 ![AgentWatch Architecture Diagram](architecture.svg)
 
-The full annotated diagram with data-flow details lives in [`architecture_diagram.md`](architecture_diagram.md).
+The full annotated diagram with data-flow details lives in [`architecture.md`](architecture.md).
 
 **How it flows:**
 
@@ -462,7 +462,7 @@ agentwatch/
 │   ├── screenshots/
 │   └── index.html                 # Landing page (GitHub Pages)
 ├── architecture.svg               # System architecture diagram
-├── architecture_diagram.md        # Annotated architecture with data flows
+├── architecture.md        # Annotated architecture with data flows
 ├── .env.example
 ├── LICENSE
 └── README.md
