@@ -14,6 +14,7 @@
   <img src="https://img.shields.io/badge/OpenTelemetry-1.27.0-blueviolet?style=for-the-badge" />
   <img src="https://img.shields.io/badge/Three.js-r128-black?style=for-the-badge" />
   <img src="https://img.shields.io/badge/Python-3.10-blue?style=for-the-badge&logo=python" />
+  <img src="https://img.shields.io/badge/Tests-81%20passing-brightgreen?style=for-the-badge&logo=pytest" />
 </p>
 
 <p align="center">
@@ -87,17 +88,32 @@ AgentWatch wraps any LangGraph, CrewAI, or OpenAI Agents SDK agent with OpenTele
 
 ## 📸 Screenshots
 
-### 🧠 Live Brain — Loop Anomaly Detected
-![AgentWatch brain visualization](docs/screenshots/screenshot-hero.png)
+### 🧠 Live Brain — Anomaly Detected in Real Time
+*Force-directed Three.js graph showing 164 events, 65 anomalies, 0.47 avg trust. Red pulsing nodes = anomaly paths. Alert overlay shows Foundation-Sec explanation with EXPLAIN / SPLUNK / EXPORT PDF actions. SPL Assistant running "What are the slowest steps?" below.*
+
+![AgentWatch Live Brain — anomaly detected, trust collapse alert, SPL assistant active](docs/screenshots/screenshot-hero.png)
+
+---
+
+### 📊 Agent Operations CRM Dashboard — `/ops`
+*CRM-style run history across 6 agent runs: trust trend line chart, anomaly type doughnut (260 total anomalies), SLO status panel, and per-run cost tracker. Sortable table shows HEALTHY / WARNING / CRITICAL status per run with trust bars, token counts, and duration.*
+
+![AgentWatch Agent Ops Dashboard — run history, trust trend, anomaly breakdown, SLO status](docs/screenshots/screenshot-ops.png)
+
+---
 
 ### 📊 Splunk Dashboard — Real Telemetry
-![AgentWatch Splunk dashboard](docs/screenshots/screenshot-dashboard-top.png)
+*Native Splunk dashboard showing real indexed data: 1,269 total events, 180 anomalies detected, 59.7% avg trust score, 1 active agent, 159,970 total tokens. Panels include agent run value timeline, anomaly detection (2968), tool call frequency, token usage by step, and trust score by tool — all from `index=agentwatch`.*
 
-### 🗂️ Agent Operations CRM Dashboard `/ops`
-Live: https://agentwatch-production-4a86.up.railway.app/ops
+![AgentWatch Splunk Dashboard — 1,269 events, 180 anomalies, 59.7% avg trust, 159,970 tokens](docs/screenshots/screenshot-dashboard.png)
 
-### 🗺️ Multi-Agent Topology Map `/topology`
-Live: https://agentwatch-production-4a86.up.railway.app/topology
+---
+
+### 🗺️ Multi-Agent Topology Map — `/topology`
+*Second Three.js visualization: 1 agent hub (octahedral, purple), 48 nodes, 47 edges, 7 anomalies. Red pulsing rings on anomaly nodes, teal data-flow edges, red anomaly-path edges. Node Inspector panel shows trust score bar and connection count on click.*
+
+![AgentWatch Multi-Agent Topology Map — force-directed graph with anomaly nodes and node inspector](docs/screenshots/screenshot-topology.png)
+
 
 ---
 
@@ -107,7 +123,9 @@ Live: https://agentwatch-production-4a86.up.railway.app/topology
 
 > Full annotated diagram with data-flow sequences: [`architecture.md`](architecture.md)
 
-**How it flows:**
+**Two-stage anomaly detection pipeline:**
+
+AgentWatch runs anomaly detection in two stages. First, an in-process `AnomalyDetector` pre-filters events before they reach Splunk — catching loops, token spikes, latency drift, error bursts, and trust collapse in real time with live-configurable thresholds. Second, SPL queries feed tool-call time-series into Splunk AI Toolkit's `anomalydetection` command for statistical confirmation (99.25% confidence). Both stages are complementary: the pre-filter catches failures instantly; the Splunk layer provides historical statistical context.
 
 ```
 ANY AGENT (LangGraph · CrewAI · OpenAI Agents · AutoGen)
@@ -130,15 +148,15 @@ ANY AGENT (LangGraph · CrewAI · OpenAI Agents · AutoGen)
  14 API endpoints
          │
          ▼
-[AnomalyDetector — in-process pre-filter]
+[Stage 1 — AnomalyDetector (in-process pre-filter)]
  loop ≥5 · token spike ≥3k · latency ≥3s · error burst ≥3 · trust ≤0.3
- all thresholds configurable via /api/config + UI
+ all thresholds configurable live via /api/config + UI
  CRITICAL anomalies → Slack webhook notification
          │
          ▼
 [Splunk HEC] → index=agentwatch · sourcetype=agentwatch:otel
          │
-         ├── Splunk AI Toolkit — anomalydetection (99.25% confidence)
+         ├── [Stage 2] Splunk AI Toolkit — anomalydetection (99.25% confidence)
          ├── Splunk MCP Server — all telemetry searchable via SPL
          ├── Splunk AI Assistant — "show loops last hour" → SPL
          └── Foundation-Sec-1.1-8B — Explain · Autopsy · PDF
@@ -179,10 +197,10 @@ ANY AGENT (LangGraph · CrewAI · OpenAI Agents · AutoGen)
 
 | Capability | How AgentWatch Uses It |
 |---|---|
-| **Splunk MCP Server** | All agent telemetry indexed; SPL queries run directly from the UI panel |
-| **Splunk AI Toolkit** | `anomalydetection` on tool-call time-series — 99.25% confidence, 180 anomalies caught |
-| **Foundation-Sec-1.1-8B** | "Explain This" per-anomaly + "Run Autopsy" full-trace graded report + PDF incident export |
-| **Splunk AI Assistant** | NL → SPL; type "show me all loops in the last hour" → live results |
+| **Splunk MCP Server** | All agent telemetry indexed to `index=agentwatch`; SPL queries run directly from the UI assistant panel |
+| **Splunk AI Toolkit** | `anomalydetection` on tool-call time-series — Stage 2 statistical confirmation at 99.25% confidence, 180 anomalies caught |
+| **Foundation-Sec-1.1-8B** | "Explain This" per-anomaly root cause + "Run Autopsy" full-trace graded report + PDF incident export |
+| **Splunk AI Assistant** | NL → SPL; type "show me all loops in the last hour" → live SPL results |
 
 ---
 
@@ -196,7 +214,69 @@ ANY AGENT (LangGraph · CrewAI · OpenAI Agents · AutoGen)
 | Error burst | ≥3 errors in one trace | HIGH | ✅ UI slider |
 | Trust collapse | trust_score ≤0.3 | CRITICAL | ✅ UI slider |
 
-All thresholds are adjustable live via the **⚙ Config** panel — no SPL editing required.
+All thresholds are adjustable live via the **⚙ Config** panel — no SPL editing required. Changes propagate immediately to the `AnomalyDetector` instance via `POST /api/config`.
+
+---
+
+## 🧪 Tests
+
+AgentWatch has **81 tests** across two files covering the full detection + API pipeline.
+
+### Run all tests
+
+```bash
+pip install pytest pytest-asyncio httpx reportlab
+pytest backend/tests/ -v
+# 81 passed in ~1s
+```
+
+### Test files
+
+| File | Tests | What it covers |
+|---|---|---|
+| `backend/tests/test_anomaly.py` | 32 | `AnomalyDetector` class — all 5 detection types, trust formula, severity levels, trace isolation, reset |
+| `backend/tests/test_api.py` | 49 | FastAPI endpoints — `/api/history`, `/api/config` GET+POST, `/api/export/incident` PDF, `/api/explain`, Slack webhook, live threshold propagation |
+
+### Coverage by feature
+
+**`test_anomaly.py` — AnomalyDetector unit tests**
+
+| Class | Tests | Verifies |
+|---|---|---|
+| `TestLoopDetection` | 10 | Threshold boundary, severity HIGH→CRITICAL at 10 calls, per-tool isolation, per-trace isolation, `record_tool_call` / `is_loop_detected` helpers |
+| `TestTrustScore` | 3 | Formula matches `langgraph_hooks.py` exactly, floor of 0.05, healthy agent > 0.7 |
+| `TestTokenSpike` | 5 | Below threshold = no anomaly, spike at threshold+1, severity MEDIUM→CRITICAL at 3×, matches hallucinate mode (5k–9k tokens) |
+| `TestLatencyDrift` | 5 | Threshold boundary, severity MEDIUM→HIGH at 2×, matches drift mode formula at call_count=36 |
+| `TestTrustCollapse` | 3 | Fires at ≤0.3, silent above 0.3, CRITICAL at 0.05 floor |
+| `TestErrorBurst` | 2 | Silent at 1 error, fires at 3 |
+| `TestCheckEventPipeline` | 4 | `step_start` never fires, anomaly logged to stats, `get_latest_anomaly`, `reset_trace` clears counts |
+
+**`test_api.py` — FastAPI integration tests (all external calls mocked)**
+
+| Class | Tests | Verifies |
+|---|---|---|
+| `TestHealth` | 2 | Returns `status=ok`, buffer size correct |
+| `TestEvents` | 4 | Empty buffer, seeded events returned, `?event_type=` filter, `?limit=` cap |
+| `TestStats` | 2 | Empty buffer defaults, correct aggregation (events / anomalies / agents / avg_trust) |
+| `TestHistory` | 8 | Empty buffer, single trace → one run, multiple traces, avg_trust math, anomaly_count, `?limit=`, required fields, events missing `trace_id` ignored |
+| `TestConfig` | 11 | GET defaults, POST each field, partial update preserves others, GET reflects POST — plus **4 live propagation tests**: loop/token/latency/trust threshold changes immediately affect `AnomalyDetector` firing behaviour |
+| `TestSlackWebhook` | 4 | No-op when URL unset, POST fires when set, message contains anomaly type, HTTP failure is non-fatal |
+| `TestPDFExport` | 6 | `application/pdf` Content-Type, non-empty body, `%PDF` magic bytes, filename in Content-Disposition, minimal payload, all 4 severity levels |
+| `TestExplain` | 4 | Required fields present, minimal payload, severity/SPL are strings |
+| `TestUpdateThresholds` | 6 | Direct `AnomalyDetector.update_thresholds()` unit tests — all 4 fields + partial update + `None` is no-op |
+
+### What the live-propagation tests prove
+
+The `TestConfig` propagation tests are the most important for the hackathon: they prove that changing a threshold via the UI (`POST /api/config`) immediately changes what the detector catches — not just what's stored in `alert_config`. For example:
+
+```python
+# Set loop threshold to 3 via the API
+client.post("/api/config", json={"loop_threshold": 3})
+
+# Now 3 tool calls fires a loop anomaly — with default 5 it would have been silent
+result = anomaly_detector.check_event(tool_event)
+assert result.anomaly_type == "loop"  # ✅ passes
+```
 
 ---
 
@@ -345,7 +425,21 @@ python backend/agent/agent_runner.py --mode drift       # latency drift
 
 Or click the demo buttons directly in the UI — no terminal needed.
 
-### 4. Try the API
+### 4. Run Tests
+
+```bash
+pip install pytest pytest-asyncio httpx reportlab
+pytest backend/tests/ -v
+```
+
+Expected output:
+```
+backend/tests/test_anomaly.py ................................ [ 39%]
+backend/tests/test_api.py ..................................................  [100%]
+81 passed in 0.81s
+```
+
+### 5. Try the API
 
 ```bash
 # Trigger a loop demo
@@ -409,7 +503,7 @@ index=agentwatch trust_score=* | timechart span=5m avg(trust_score) by agent_id
 index=agentwatch event_type=llm_call llm_total_tokens>=3000
 | table _time, agent_id, trace_id, llm_total_tokens, step_name
 
--- Native Splunk anomaly detection
+-- Native Splunk anomaly detection (Stage 2)
 index=agentwatch event_type=tool_call | timechart span=1h count as tool_calls
 | anomalydetection tool_calls
 ```
@@ -424,7 +518,7 @@ index=agentwatch event_type=tool_call | timechart span=1h count as tool_calls
 | Observability | OpenTelemetry SDK 1.27.0 | Capture every LLM/tool call |
 | SDK | `agentwatch_sdk.py` + `agentwatch_hooks.py` | Zero-config instrumentation |
 | Event transport | Splunk HEC (port 8088) | Real-time telemetry delivery |
-| Anomaly detection | `AnomalyDetector` + Splunk AI Toolkit | In-process + statistical |
+| Anomaly detection | `AnomalyDetector` + Splunk AI Toolkit | In-process pre-filter + statistical confirmation |
 | Reasoning | Foundation-Sec-1.1-8B | Explain · Autopsy · PDF |
 | NL queries | Splunk AI Assistant | Natural language → SPL |
 | Notifications | Slack webhook (httpx) | CRITICAL anomaly alerts |
@@ -432,6 +526,7 @@ index=agentwatch event_type=tool_call | timechart span=1h count as tool_calls
 | 3D visualization | Three.js r128 | Brain graph + topology map |
 | Ops dashboard | Chart.js 4.4.1 | Trust trend + anomaly charts |
 | PDF export | reportlab ≥4.0.0 | Incident report generation |
+| Testing | pytest + pytest-asyncio | 81 tests, fully offline |
 | Splunk app | Native `.conf` packaging | Splunkbase-ready |
 | Deployment | Railway | Live demo |
 | Frontend hosting | GitHub Pages | Landing page |
@@ -456,6 +551,9 @@ agentwatch/
 │   │   ├── splunk_client.py       # Splunk REST + MCP + AI Assistant
 │   │   ├── foundation_sec.py      # Foundation-Sec-1.1-8B client
 │   │   └── autopsy.py             # Agent Autopsy (grade A–F)
+│   ├── tests/
+│   │   ├── test_anomaly.py        # 32 unit tests — AnomalyDetector (all 5 types)
+│   │   └── test_api.py            # 49 integration tests — all API endpoints
 │   ├── agentwatch_sdk.py          # Zero-config @watch / watch_graph
 │   ├── agentwatch_hooks.py        # CrewAI · OpenAI Agents · AutoGen hooks
 │   └── requirements.txt
@@ -481,11 +579,16 @@ agentwatch/
 │       └── metadata/
 ├── docs/
 │   ├── screenshots/
+│   │   ├── screenshot-hero.png         # Live Brain — anomaly detected
+│   │   ├── screenshot-ops.png          # Agent Ops CRM Dashboard
+│   │   ├── screenshot-topology.png     # Multi-Agent Topology Map
+│   │   └── screenshot-splunk-tools.png # All 4 Splunk AI tools active
 │   └── index.html                 # GitHub Pages landing
 ├── architecture.svg               # Architecture diagram (dark theme)
 ├── architecture.md                # Annotated architecture with data flows
 ├── .env.example
 ├── LICENSE
+├── CONTRIBUTING.md
 └── README.md
 ```
 
@@ -504,6 +607,7 @@ agentwatch/
 | Frontend pages | 3 |
 | API endpoints | 14 |
 | Splunk AI capabilities used | 4 |
+| Test coverage | 81 tests passing |
 
 ---
 
