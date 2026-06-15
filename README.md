@@ -33,9 +33,9 @@
 
 ## 🎬 Demo Video
 
-[![AgentWatch Demo](docs/screenshots/demo-thumbnail.png)](https://youtu.be/r3z11Z0exW8)
+[![AgentWatch Demo](https://img.youtube.com/vi/r3z11Z0exW8/maxresdefault.jpg)](https://youtu.be/r3z11Z0exW8)
 
-▶ [Watch the demo on YouTube](https://youtu.be/r3z11Z0exW8)
+▶ [Watch the 5-minute demo on YouTube](https://youtu.be/r3z11Z0exW8)
 
 ---
 
