@@ -360,6 +360,18 @@ One-click PDF from the alert overlay or Agent Ops table:
 
 ---
 
+## 🧭 Per-Page Onboarding Guide
+
+First-time visitors on any page see a contextual guide overlay explaining what that page does and how to use it — no docs required.
+
+- **Live Brain** — explains run modes, bubble colours, node inspector, anomaly alerts, SPL query bar, sparklines, and trace timeline
+- **Agent Ops** — explains the six KPI metrics, run history table, mode filters, trust trend chart, anomaly donut, and time window selector
+- **Topology Map** — explains node/edge colour legend, node inspector, Loop/Drift demo buttons, and pan/zoom navigation
+
+The guide fires automatically on first visit per page (stored in `localStorage`). A persistent **?** button stays fixed bottom-left so users can re-open it anytime. Served from `frontend/guide.js` via the `/guide.js` FastAPI route.
+
+---
+
 ## 🔔 Slack Notifications
 
 Add `SLACK_WEBHOOK_URL` to `.env` to receive CRITICAL anomaly alerts:
@@ -482,6 +494,7 @@ curl -X POST https://agentwatch-production-4a86.up.railway.app/api/config \
 | `GET` | `/` | Live Brain visualization |
 | `GET` | `/ops` | Agent Operations CRM Dashboard |
 | `GET` | `/topology` | Multi-agent topology map |
+| `GET` | `/guide.js` | Per-page onboarding guide script |
 
 ---
 
@@ -561,6 +574,7 @@ agentwatch/
 │   ├── index.html                 # Live Brain (main app)
 │   ├── ops.html                   # Agent Operations CRM Dashboard
 │   ├── topology.html              # Multi-agent topology map
+│   ├── guide.js                   # Per-page onboarding guide (auto-detects page, shows on first visit)
 │   └── src/
 │       ├── brain.js               # Three.js force-directed brain
 │       ├── websocket.js           # WebSocket + demo fallback
@@ -605,7 +619,7 @@ agentwatch/
 | Loop confidence (Splunk AI Toolkit) | 99.25% |
 | Frameworks supported | 5 |
 | Frontend pages | 3 |
-| API endpoints | 14 |
+| API endpoints | 15 |
 | Splunk AI capabilities used | 4 |
 | Test coverage | 81 tests passing |
 
