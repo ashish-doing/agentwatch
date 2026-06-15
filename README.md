@@ -33,12 +33,9 @@
 
 ## 🎬 Demo Video
 
-> **Recording in progress** — video will be added before the June 15 deadline.
+[![AgentWatch Demo](docs/screenshots/demo-thumbnail.png)](https://youtu.be/r3z11Z0exW8)
 
-<!-- Replace this comment with your video embed once recorded:
-[![AgentWatch Demo](https://img.youtube.com/vi/YOUR_VIDEO_ID/maxresdefault.jpg)](https://youtu.be/YOUR_VIDEO_ID)
-▶ [Watch the demo on YouTube](https://youtu.be/YOUR_VIDEO_ID)
--->
+▶ [Watch the demo on YouTube](https://youtu.be/r3z11Z0exW8)
 
 ---
 
