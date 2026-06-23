@@ -226,7 +226,7 @@ sequenceDiagram
 | Splunk AI capabilities | 4 (MCP · AI Toolkit · Foundation-Sec · AI Assistant) |
 | Splunk index | `agentwatch` |
 | Source type | `agentwatch:otel` |
-| Live demo | https://agentwatch-production-4a86.up.railway.app |
+| Live demo | https://agentwatch-i555.onrender.com |
 
 ---
 
